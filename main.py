@@ -16,7 +16,7 @@ def train(env_name, num_of_episodes):
         state = env.reset()
         episode_reward = 0
 
-        for step in range(200):
+        for step in range(20000):
             if episode % 5 == 0:
                 env.render()
             action = agent.get_action(state)
