@@ -17,8 +17,8 @@ class Agent(object):
         critic_learning_rate=1e-3
         self.critic_loss_fn  = nn.MSELoss()
 
-        self.actor = Actor(env.observation_space.shape[0], env.action_space.shape[0], 2)
-        self.actor_target = Actor(env.observation_space.shape[0], env.action_space.shape[0], 2)
+        self.actor = Actor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
+        self.actor_target = Actor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
         for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
             target_param.data.copy_(param.data)
 
