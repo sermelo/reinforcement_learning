@@ -39,10 +39,10 @@ class Agent(object):
 
     def save(self, state, action, reward, new_state):
         self.memory.push(state, action, reward, new_state)
-        if (len(self.memory) > self.batch_size):
-            self.update()
 
     def update(self):
+        if (len(self.memory) < self.batch_size):
+            return
         states, actions, rewards, next_states = self.memory.get_batch(self.batch_size)
 
         states_q_values = self.critic.forward(states, actions)
