@@ -1,9 +1,9 @@
 import gym
 import numpy as np
+import argparse
 import matplotlib.pyplot as plt
 
 from lib.agent import Agent
-
 gym.logger.set_level(40)
 
 def train(env_name, num_of_episodes):
@@ -40,6 +40,9 @@ def train(env_name, num_of_episodes):
     plt.ylabel('Reward')
     plt.show()
 
-environment_name = 'Pendulum-v0'
+parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
+parser.add_argument('--env', dest='environment_name', type=str, choices=['Pendulum-v0'],
+                    required=True, help='Openai environment')
+args = parser.parse_args()
 num_of_episodes = 75
-train(environment_name, num_of_episodes)
+train(args.environment_name, num_of_episodes)
