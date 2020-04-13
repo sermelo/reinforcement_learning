@@ -11,6 +11,11 @@ class Agent(object):
     def __init__(self, env, batch_size):
         self.batch_size = batch_size
         self.tau = 1e-2
+        memory_size = 50000
+        self.gamma = 0.99
+        actor_learning_rate=1e-4
+        critic_learning_rate=1e-3
+        self.critic_loss_fn  = nn.MSELoss()
 
         self.actor = Actor(env.observation_space.shape[0], env.action_space.shape[0], 2)
         self.actor_target = Actor(env.observation_space.shape[0], env.action_space.shape[0], 2)
@@ -21,15 +26,10 @@ class Agent(object):
         self.critic_target = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
         for target_param, param in zip(self.critic_target.parameters(), self.critic.parameters()):
             target_param.data.copy_(param.data)
-        self.memory = Memory(50000)
+        self.memory = Memory(memory_size)
 
-        self.gamma = 0.99
-        self.critic_loss_fn  = nn.MSELoss()
-        actor_learning_rate=1e-4
-        critic_learning_rate=1e-3
         self.actor_optimizer  = optim.Adam(self.actor.parameters(), lr=actor_learning_rate)
         self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=critic_learning_rate)
-
 
     def get_action(self, state):
         tensor_state = Variable(torch.from_numpy(state).float().unsqueeze(0))
