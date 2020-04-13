@@ -40,8 +40,9 @@ def train(env_name, num_of_episodes):
     plt.ylabel('Reward')
     plt.show()
 
+supported_environments = ['Pendulum-v0']
 parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
-parser.add_argument('--env', dest='environment_name', type=str, choices=['Pendulum-v0'],
+parser.add_argument('--env', dest='environment_name', type=str, choices=supported_environments,
                     required=True, help='Openai environment')
 args = parser.parse_args()
 num_of_episodes = 75
