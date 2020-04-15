@@ -21,7 +21,7 @@ def train(env_name, num_of_episodes, update_rate):
                 env.render()
             action = agent.get_action(state)
             new_state, reward, done, info = env.step(action)
-            agent.save(state, action, reward, new_state)
+            agent.save(state, action, reward, new_state, done)
             state = new_state
             episode_reward += reward
             if done:
