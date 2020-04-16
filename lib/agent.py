@@ -37,19 +37,19 @@ class Agent(object):
         #tensor_action = self.actor.forward(tensor_state)
         return tensor_action.detach().numpy()[0]
 
-    def save(self, state, action, reward, new_state, done):
-        self.memory.push(state, action, reward, new_state, done)
+    def save(self, state, action, reward, new_state, fail):
+        self.memory.push(state, action, reward, new_state, fail)
 
     def update(self):
         if (len(self.memory) < self.batch_size):
             return
-        states, actions, rewards, next_states, done = self.memory.get_batch(self.batch_size)
+        states, actions, rewards, next_states, fails = self.memory.get_batch(self.batch_size)
 
         states_q_values = self.critic.forward(states, actions)
         next_actions = self.actor_target.forward(next_states)
         next_states_q_value = self.critic_target.forward(next_states, next_actions.detach())
-        not_done = (done == 0).view(done.size()[0], 1)
-        next_states_q_value = next_states_q_value * not_done
+        not_fails = (fails == 0).view(fails.size()[0], 1)
+        next_states_q_value = next_states_q_value * not_fails
         new_q_value = rewards + (self.gamma * next_states_q_value)
         critic_loss = self.critic_loss_fn(states_q_values, new_q_value)
 

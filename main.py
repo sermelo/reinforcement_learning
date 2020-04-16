@@ -8,6 +8,7 @@ gym.logger.set_level(40)
 
 def train(env_name, num_of_episodes, update_rate):
     env = gym.make(env_name)
+    max_steps = env.spec.max_episode_steps
     batch_size = 200
     agent = Agent(env, batch_size)
 
@@ -16,12 +17,13 @@ def train(env_name, num_of_episodes, update_rate):
         state = env.reset()
         episode_reward = 0
 
-        for step in range(20000):
+        for step in range(max_steps):
             if episode % 25 == 0:
                 env.render()
             action = agent.get_action(state)
             new_state, reward, done, info = env.step(action)
-            agent.save(state, action, reward, new_state, done)
+            fail = done if (step+1) < max_steps else False
+            agent.save(state, action, reward, new_state, fail)
             state = new_state
             episode_reward += reward
             if done:
