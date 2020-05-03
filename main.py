@@ -6,11 +6,8 @@ import matplotlib.pyplot as plt
 from lib.agent import Agent
 gym.logger.set_level(40)
 
-def train(env_name, num_of_episodes, update_rate):
-    env = gym.make(env_name)
+def train(agent, env, num_of_episodes, update_rate):
     max_steps = env.spec.max_episode_steps
-    batch_size = 200
-    agent = Agent(env, batch_size)
 
     all_episodes_rewards = []
     for episode in range(num_of_episodes):
@@ -43,6 +40,7 @@ def train(env_name, num_of_episodes, update_rate):
     plt.xlabel('Episode')
     plt.ylabel('Reward')
     plt.show()
+    return agent
 
 supported_environments = ['Pendulum-v0', 'Ant-v3', 'Hopper-v3', 'Walker2d-v3']
 parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
@@ -54,4 +52,8 @@ parser.add_argument('--nn-update-rate', dest="nn_update_rate", type=int, default
                     help='Number of neuronal networks update per episode')
 
 args = parser.parse_args()
-train(args.environment_name, args.episodes, args.nn_update_rate)
+
+batch_size = 200
+env = gym.make(args.environment_name)
+agent = Agent(env, batch_size)
+train(agent, env, args.episodes, args.nn_update_rate)
