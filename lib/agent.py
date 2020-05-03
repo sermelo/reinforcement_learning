@@ -42,7 +42,6 @@ class Agent(object):
         tensor_action = self.actor.forward(tensor_state)
         return tensor_action.detach().numpy()[0]
 
-
     def save(self, state, action, reward, new_state, fail):
         self.memory.push(state, action, reward, new_state, fail)
 
@@ -64,6 +63,7 @@ class Agent(object):
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
+        self.actor.reset_noise()
 
         self.critic_optimizer.zero_grad()
         critic_loss.backward()

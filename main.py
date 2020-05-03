@@ -66,7 +66,7 @@ parser.add_argument('--env', dest='environment_name', type=str, choices=supporte
 parser.add_argument('--episodes', dest="episodes", type=int, default=100, required=False,
                     help='Number of episodes to run')
 parser.add_argument('--nn-update-rate', dest="nn_update_rate", type=int, default=100, required=False,
-                    help='Number of neuronal networks update per episode')
+                    help='Number of neuronal networks training cicles per episode')
 
 args = parser.parse_args()
 

@@ -3,27 +3,22 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from lib.noisy_linnear import NoisyLinear
 
 class Actor(nn.Module): 
     def __init__(self, input_size, output_size, high, low):
         super(Actor, self).__init__()
         self.hidden_size = 256
-        self.learning_rate = 1e-4
 
-        #learning noise variables
         self.low = torch.tensor(low)
         self.high = torch.tensor(high)
-        self.mu = 0
-        self.sigma = 2
-        self.min_sigma = 0.01
-        self.sigma_step = 0.0001
-        #self.sigma_step = 0.00005
  
-        self.linear1 = nn.Linear(input_size, self.hidden_size)
-        self.linear2 = nn.Linear(self.hidden_size, self.hidden_size)
-        self.linear3 = nn.Linear(self.hidden_size, output_size)
+        self.linear1 = NoisyLinear(input_size, self.hidden_size)
+        self.linear2 = NoisyLinear(self.hidden_size, self.hidden_size)
+        self.linear3 = NoisyLinear(self.hidden_size, output_size)
  
     def forward(self, state):
+        self.__noise_off()
         x = F.relu(self.linear1(state))
         x = F.relu(self.linear2(x))
         x = torch.tanh(self.linear3(x))
@@ -31,11 +26,24 @@ class Actor(nn.Module):
         return x
 
     def noisy_forward(self, state):
-        actions = self.forward(state)
-        noise = np.random.normal(self.mu, self.sigma)
-        noisy_action = actions + noise
-        noisy_action = torch.min(noisy_action, self.high)
-        noisy_action = torch.max(noisy_action, self.low)
-        if (self.sigma > self.min_sigma):
-            self.sigma -= self.sigma_step
-        return noisy_action
+        self.__noise_on()
+        x = F.relu(self.linear1(state))
+        x = F.relu(self.linear2(x))
+        x = torch.tanh(self.linear3(x))
+        x = x * self.high
+        return x
+
+    def reset_noise(self):
+        self.linear1.reset_noise()
+        self.linear2.reset_noise()
+        self.linear3.reset_noise()
+
+    def __noise_on(self):
+        self.linear1.noise_on()
+        self.linear2.noise_on()
+        self.linear3.noise_on()
+
+    def __noise_off(self):
+        self.linear1.noise_off()
+        self.linear2.noise_off()
+        self.linear3.noise_off()
