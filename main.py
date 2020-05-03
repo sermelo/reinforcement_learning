@@ -6,22 +6,25 @@ import matplotlib.pyplot as plt
 from lib.agent import Agent
 gym.logger.set_level(40)
 
-def test(agent, env, num_of_episodes):
+def test_one_episode(agent, env):
     max_steps = env.spec.max_episode_steps
+    state = env.reset()
+    episode_reward = 0
 
+    for step in range(max_steps):
+        env.render()
+        action = agent.get_test_action(state)
+        state, reward, done, info = env.step(action)
+        episode_reward += reward
+        if done:
+            break
+    return episode_reward, step
+
+def test(agent, env, num_of_episodes):
     all_episodes_rewards = 0
     for episode in range(num_of_episodes):
-        state = env.reset()
-        episode_reward = 0
-
-        for step in range(max_steps):
-            env.render()
-            action = agent.get_test_action(state)
-            state, reward, done, info = env.step(action)
-            episode_reward += reward
-            if done:
-                print("episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
-                break
+        episode_reward, step = test_one_episode(agent, env)
+        print("episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
         all_episodes_rewards += episode_reward
     return all_episodes_rewards/num_of_episodes
 
