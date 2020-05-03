@@ -37,6 +37,12 @@ class Agent(object):
         #tensor_action = self.actor.forward(tensor_state)
         return tensor_action.detach().numpy()[0]
 
+    def get_test_action(self, state):
+        tensor_state = Variable(torch.from_numpy(state).float().unsqueeze(0))
+        tensor_action = self.actor.forward(tensor_state)
+        return tensor_action.detach().numpy()[0]
+
+
     def save(self, state, action, reward, new_state, fail):
         self.memory.push(state, action, reward, new_state, fail)
 

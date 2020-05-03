@@ -6,6 +6,25 @@ import matplotlib.pyplot as plt
 from lib.agent import Agent
 gym.logger.set_level(40)
 
+def test(agent, env, num_of_episodes):
+    max_steps = env.spec.max_episode_steps
+
+    all_episodes_rewards = 0
+    for episode in range(num_of_episodes):
+        state = env.reset()
+        episode_reward = 0
+
+        for step in range(max_steps):
+            env.render()
+            action = agent.get_test_action(state)
+            state, reward, done, info = env.step(action)
+            episode_reward += reward
+            if done:
+                print("episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
+                break
+        all_episodes_rewards += episode_reward
+    return all_episodes_rewards/num_of_episodes
+
 def train(agent, env, num_of_episodes, update_rate):
     max_steps = env.spec.max_episode_steps
 
@@ -29,7 +48,6 @@ def train(agent, env, num_of_episodes, update_rate):
         for _ in range(update_rate):
             agent.update()
         all_episodes_rewards.append(episode_reward)
-    env.close()
 
     avg_rewards = []
     avg_rewards.append(np.mean(all_episodes_rewards[-10:]))
@@ -40,7 +58,6 @@ def train(agent, env, num_of_episodes, update_rate):
     plt.xlabel('Episode')
     plt.ylabel('Reward')
     plt.show()
-    return agent
 
 supported_environments = ['Pendulum-v0', 'Ant-v3', 'Hopper-v3', 'Walker2d-v3']
 parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
@@ -56,4 +73,8 @@ args = parser.parse_args()
 batch_size = 200
 env = gym.make(args.environment_name)
 agent = Agent(env, batch_size)
+print('****TRAINING****')
 train(agent, env, args.episodes, args.nn_update_rate)
+print('****TESTING****')
+test(agent, env, 20)
+env.close()
