@@ -79,7 +79,7 @@ def plot_rewards(name, train_rewards):
     plt.legend()
     plt.pause(0.001)
 
-supported_environments = ['Pendulum-v0', 'Ant-v3', 'Hopper-v3', 'Walker2d-v3']
+supported_environments = ['Pendulum-v0', 'LunarLanderContinuous-v2', 'BipedalWalker-v3', 'Hopper-v3', 'Walker2d-v3', 'HalfCheetah-v2', 'Ant-v3']
 parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
 parser.add_argument('--env', dest='environment_name', type=str, choices=supported_environments,
                     required=True, help='Openai environment')
