@@ -58,33 +58,26 @@ def train(agent, env, num_of_episodes, update_rate):
 
         all_episodes_rewards.append(episode_reward)
 
-#        test_episode_reward, test_step = test_one_episode(agent, env, False)
-#        test_episodes_rewards.append(test_episode_reward)
-#        plot_rewards(all_episodes_rewards, test_episodes_rewards)
-        plot_rewards(all_episodes_rewards)
+        test_episode_reward, test_step = test_one_episode(agent, env, False)
+        test_episodes_rewards.append(test_episode_reward)
+    plot_rewards('Training', all_episodes_rewards)
+    plot_rewards('Test', test_episodes_rewards)
 
-def plot_rewards(train_rewards):#, test_rewards):
-    plt.figure(2)
+def plot_rewards(name, train_rewards):
+    plt.figure(name)
     plt.clf()
-    avg_of = 15
+    avg_of = 100
     rewards = torch.tensor(train_rewards, dtype=torch.float)
-    #test_rewards = torch.tensor(test_rewards, dtype=torch.float)
-    plt.title('Training...')
+    plt.title(f'{name} rewards')
     plt.xlabel('Episode')
     plt.ylabel('Duration')
     plt.plot(rewards.numpy(), label='Episode reward')
-    #plt.plot(test_rewards.numpy(), label='Test episode reward')
     if len(rewards) >= avg_of:
         train_means = rewards.unfold(0, avg_of, 1).mean(1).view(-1)
-        #test_means = test_rewards.unfold(0, avg_of, 1).mean(1).view(-1)
         means_x = list(range(avg_of -1, len(rewards)))
         plt.plot(means_x, train_means.numpy(), label=f'{avg_of} episodes avg reward')
-        #plt.plot(means_x, test_means.numpy(), label=f'Test {avg_of} episodes avg reward')
-
     plt.legend()
-    plt.pause(0.001)  # pause a bit so that plots are updated
-
-
+    plt.pause(0.001)
 
 supported_environments = ['Pendulum-v0', 'Ant-v3', 'Hopper-v3', 'Walker2d-v3']
 parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
