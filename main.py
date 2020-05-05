@@ -42,8 +42,8 @@ def train(agent, env, num_of_episodes, update_rate):
         episode_reward = 0
 
         for step in range(max_steps):
-            #if episode % 25 == 0:
-            #    env.render()
+            if episode % 100 == 0:
+                env.render()
             action = agent.get_action(state)
             new_state, reward, done, info = env.step(action)
             fail = done if (step+1) < max_steps else False
