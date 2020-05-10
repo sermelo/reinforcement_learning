@@ -31,6 +31,7 @@ def test(agent, env, num_of_episodes):
     return all_episodes_rewards/num_of_episodes
 
 def train(agent, env, num_of_episodes, update_rate):
+    episodes_show = 50
     max_steps = env.spec.max_episode_steps
 
     all_episodes_rewards = []
@@ -38,12 +39,14 @@ def train(agent, env, num_of_episodes, update_rate):
     test_episodes_rewards = []
     test_avg_rewards = []
     for episode in range(num_of_episodes):
+        show = False
+        if episode % episodes_show == 0:
+            show = True
         state = env.reset()
         episode_reward = 0
 
         for step in range(max_steps):
-            if episode % 100 == 0:
-                env.render()
+            # env.render()
             action = agent.get_action(state)
             new_state, reward, done, info = env.step(action)
             fail = done if (step+1) < max_steps else False
@@ -57,10 +60,13 @@ def train(agent, env, num_of_episodes, update_rate):
 
         all_episodes_rewards.append(episode_reward)
 
-        test_episode_reward, test_step = test_one_episode(agent, env, False)
+
+        test_episode_reward, test_step = test_one_episode(agent, env, show)
         test_episodes_rewards.append(test_episode_reward)
-    plot_rewards('Training', all_episodes_rewards)
-    plot_rewards('Test', test_episodes_rewards)
+
+        if show:
+            plot_rewards('Test', test_episodes_rewards)
+            plot_rewards('Training', all_episodes_rewards)
 
 def plot_rewards(name, train_rewards):
     plt.figure(name)
