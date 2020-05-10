@@ -34,9 +34,10 @@ class Actor(nn.Module):
         return x
 
     def reset_noise(self):
-        self.linear1.reset_noise()
-        self.linear2.reset_noise()
-        self.linear3.reset_noise()
+        sigma = abs(np.random.normal(0, 0.1))
+        self.linear1.reset_noise(sigma)
+        self.linear2.reset_noise(sigma)
+        self.linear3.reset_noise(sigma)
 
     def __noise_on(self):
         self.linear1.noise_on()
