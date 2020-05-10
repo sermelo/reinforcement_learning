@@ -45,7 +45,12 @@ class Agent(object):
     def save(self, state, action, reward, new_state, fail):
         self.memory.push(state, action, reward, new_state, fail)
 
-    def update(self):
+    def update(self, num=1):
+        for _ in range(num):
+            self.__one_update()
+        self.actor.reset_noise()
+
+    def __one_update(self):
         if (len(self.memory) < self.batch_size):
             return
         states, actions, rewards, next_states, fails = self.memory.get_batch(self.batch_size)
@@ -63,7 +68,6 @@ class Agent(object):
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
-        self.actor.reset_noise()
 
         self.critic_optimizer.zero_grad()
         critic_loss.backward()

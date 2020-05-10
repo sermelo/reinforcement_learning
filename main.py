@@ -53,8 +53,7 @@ def train(agent, env, num_of_episodes, update_rate):
             if done:
                 print("episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
                 break
-        for _ in range(update_rate):
-            agent.update()
+        agent.update(update_rate)
 
         all_episodes_rewards.append(episode_reward)
 
