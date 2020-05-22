@@ -130,7 +130,7 @@ env = gym.make(args.environment_name)
 
 # Create data dir
 data_dir_name = f'{args.algorithm}_{args.environment_name}_{time.strftime("%Y_%m_%d_%H_%M_%S")}'
-execution_path = os.path.dirname(__file__)
+execution_path = os.path.dirname(os.path.realpath(__file__))
 data_dir = os.path.join(execution_path, data_dir_name)
 os.mkdir(data_dir)
 print(f'Data dir: {data_dir}')
