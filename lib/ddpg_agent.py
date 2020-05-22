@@ -23,17 +23,20 @@ class DdpgAgent(object):
 
         self.actor = DdpgActor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
         self.actor_target = DdpgActor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
-        for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
-            target_param.data.copy_(param.data)
+        self.copy_networks(self.actor, self.actor_target)
 
         self.critic = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
         self.critic_target = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
-        for target_param, param in zip(self.critic_target.parameters(), self.critic.parameters()):
-            target_param.data.copy_(param.data)
+        self.copy_networks(self.critic, self.critic_target)
+
         self.memory = Memory(memory_size)
 
         self.actor_optimizer  = optim.Adam(self.actor.parameters(), lr=actor_learning_rate)
         self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=critic_learning_rate)
+
+    def copy_networks(self, org_net, dest_net):
+        for dest_param, param in zip(dest_net.parameters(), org_net.parameters()):
+            dest_param.data.copy_(param.data)
 
     def get_action(self, state):
         tensor_state = Variable(torch.from_numpy(state).float().unsqueeze(0))
@@ -56,7 +59,13 @@ class DdpgAgent(object):
         torch.save(self.critic, critic_dir)
 
     def load_model(self, data_dir):
-        pass
+        actor_dir = os.path.join(data_dir, self.actor_store_dir)
+        self.actor = torch.load(actor_dir)
+        self.copy_networks(self.actor, self.actor_target)
+
+        critic_dir = os.path.join(data_dir, self.critic_store_dir)
+        self.critic = torch.load(critic_dir)
+        self.copy_networks(self.critic, self.critic_target)
 
     def update(self, num=1):
         for _ in range(num):
