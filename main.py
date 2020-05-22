@@ -9,6 +9,8 @@ gym.logger.set_level(40)
 
 def test_one_episode(agent, env, render):
     max_steps = env.spec.max_episode_steps
+    if max_steps == None:
+        max_steps = 1000
     state = env.reset()
     episode_reward = 0
 
@@ -33,6 +35,8 @@ def test(agent, env, num_of_episodes):
 def train(agent, env, num_of_episodes, update_rate):
     episodes_show = 50
     max_steps = env.spec.max_episode_steps
+    if max_steps == None:
+        max_steps = 1000
 
     all_episodes_rewards = []
     avg_rewards = []
