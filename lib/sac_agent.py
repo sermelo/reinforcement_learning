@@ -50,17 +50,16 @@ class SacAgent(object):
 
 
     def get_test_action(self, state):
-        # TODO: Review this method
-        return self.get_action(state)
+        # 100% deterministic. It is not always the best option to do it this way
+        state = torch.FloatTensor(state).unsqueeze(0)
+        mean, log_std = self.actor.forward(state)
+        action = torch.tanh(mean)
+        action = action.detach().squeeze(0).numpy()
+        return self.rescale_action(action)
 
     def get_action(self, state):
         state = torch.FloatTensor(state).unsqueeze(0)
-        mean, log_std = self.actor.forward(state)
-        std = log_std.exp()
-
-        normal = Normal(mean, std)
-        z = normal.sample()
-        action = z
+        action, log_pi = self.actor.sample(state)
         action = action.detach().squeeze(0).numpy()
         return self.rescale_action(action)
 
