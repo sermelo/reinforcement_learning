@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import torch
 
 from lib.ddpg_agent import DdpgAgent
+from lib.sac_agent import SacAgent
 
 gym.logger.set_level(40)
 
@@ -115,8 +116,7 @@ batch_size = 100
 if (args.algorithm == 'DDPG'):
     agent = DdpgAgent(env, batch_size)
 elif (args.algorithm == 'SAC'):
-    print('Algorithm not implemented yet')
-    sys.exit(1)
+    agent = SacAgent(env, batch_size)
 else:
     print('Algorithm not suported')
     sys.exit(1)
