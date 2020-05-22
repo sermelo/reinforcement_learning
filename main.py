@@ -35,8 +35,12 @@ def test(agent, env, num_of_episodes):
         all_episodes_rewards += episode_reward
     return all_episodes_rewards/num_of_episodes
 
-def train(agent, env, num_of_episodes):
-    episodes_show = 50
+def train(agent, env, num_of_episodes, episodes_show=50):
+    # Define every how many episodes we will show a test and update the graphs
+    min_episode_show = int(num_of_episodes / 10)
+    if episodes_show > min_episode_show:
+        episodes_show = min_episode_show
+
     max_steps = env.spec.max_episode_steps
     if max_steps == None:
         max_steps = 1000
