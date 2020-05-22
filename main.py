@@ -15,10 +15,10 @@ from lib.sac_agent import SacAgent
 
 gym.logger.set_level(40)
 
-def test_one_episode(agent, env, render):
-    max_steps = env.spec.max_episode_steps
-    if max_steps == None:
-        max_steps = 1000
+def test_one_episode(agent, env, render, max_steps):
+    env_max_steps = env.spec.max_episode_steps
+    if env_max_steps != None and env_max_steps < max_steps:
+        max_steps = env_max_steps
     state = env.reset()
     episode_reward = 0
 
@@ -32,15 +32,15 @@ def test_one_episode(agent, env, render):
             break
     return episode_reward, step
 
-def test(agent, env, num_of_episodes):
+def test(agent, env, num_of_episodes, max_steps):
     all_episodes_rewards = 0
     for episode in range(num_of_episodes):
-        episode_reward, step = test_one_episode(agent, env, True)
+        episode_reward, step = test_one_episode(agent, env, True, max_steps)
         print("Episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
         all_episodes_rewards += episode_reward
     return all_episodes_rewards/num_of_episodes
 
-def train(data_dir, agent, env, num_of_episodes, episodes_show=50):
+def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
     training_data_file = os.path.join(data_dir, 'training.csv')
     test_data_file = os.path.join(data_dir, 'test.csv')
     # Define every how many episodes we will show a test and update the graphs
@@ -48,9 +48,9 @@ def train(data_dir, agent, env, num_of_episodes, episodes_show=50):
     if episodes_show > min_episode_show:
         episodes_show = min_episode_show
 
-    max_steps = env.spec.max_episode_steps
-    if max_steps == None:
-        max_steps = 1000
+    env_max_steps = env.spec.max_episode_steps
+    if env_max_steps != None and env_max_steps < max_steps:
+        max_steps = env_max_steps
 
     all_episodes_rewards = []
     avg_rewards = []
@@ -89,7 +89,7 @@ def train(data_dir, agent, env, num_of_episodes, episodes_show=50):
                 train_writer.writerow([episode, step, total_steps, episode_reward])
 
                 if show:
-                    test_episode_reward, test_step = test_one_episode(agent, env, show)
+                    test_episode_reward, test_step = test_one_episode(agent, env, show, max_steps)
                     test_episodes_rewards.append(test_episode_reward)
                     test_writer.writerow([episode, test_step, total_steps, test_episode_reward])
                     plot_rewards('Test', test_episodes_rewards, episodes_show)
@@ -125,6 +125,8 @@ parser.add_argument('--episodes', dest="episodes", type=int, default=100, requir
                     help='Number of episodes to run')
 parser.add_argument('--load-model', dest="model_dir", type=str, required=False,
                     help='Load model from dir')
+parser.add_argument('--max-steps', dest="max_steps", type=int, required=False, default=500,
+                    help='Max steps per episode')
 
 
 args = parser.parse_args()
@@ -154,12 +156,12 @@ if args.model_dir:
 
 ## Train
 print('****TRAINING****')
-train(data_dir, agent, env, args.episodes)
+train(data_dir, agent, env, args.episodes, args.max_steps)
 print('Saving the model')
 agent.save_model(data_dir)
 print(f'All data saved in {data_dir}')
 input("Press Enter to see the testing...")
 print('****TESTING****')
-test(agent, env, 5)
+test(agent, env, 5, args.max_steps)
 env.close()
 input("Press Enter to end...")
