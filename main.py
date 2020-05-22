@@ -1,6 +1,7 @@
 import gym
 import safety_gym
 
+import sys
 import numpy as np
 import argparse
 import matplotlib.pyplot as plt
@@ -93,18 +94,34 @@ def plot_rewards(name, train_rewards, step=1):
     plt.legend()
     plt.pause(0.001)
 
+## Prepare the input arguments
 supported_environments = ['Pendulum-v0', 'LunarLanderContinuous-v2', 'BipedalWalker-v3', 'Hopper-v3', 'Walker2d-v3', 'HalfCheetah-v2', 'Ant-v3', 'Safexp-PointGoal1-v0']
+supported_algorithms = ['DDPG', 'SAC']
+
 parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
 parser.add_argument('--env', dest='environment_name', type=str, choices=supported_environments,
                     required=True, help='Openai environment')
+parser.add_argument('--alg', dest='algorithm', type=str, choices=supported_algorithms,
+                    required=True, help='Algorithm to use to resolve the environment')
 parser.add_argument('--episodes', dest="episodes", type=int, default=100, required=False,
                     help='Number of episodes to run')
-
 args = parser.parse_args()
 
-batch_size = 100
+## Define the environment
 env = gym.make(args.environment_name)
-agent = DdpgAgent(env, batch_size)
+
+## Define the agent
+batch_size = 100
+if (args.algorithm == 'DDPG'):
+    agent = DdpgAgent(env, batch_size)
+elif (args.algorithm == 'SAC'):
+    print('Algorithm not implemented yet')
+    sys.exit(1)
+else:
+    print('Algorithm not suported')
+    sys.exit(1)
+
+## Train
 print('****TRAINING****')
 train(agent, env, args.episodes)
 input("Press Enter to see the testing...")
