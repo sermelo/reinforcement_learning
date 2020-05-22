@@ -147,6 +147,8 @@ else:
 ## Train
 print('****TRAINING****')
 train(data_dir, agent, env, args.episodes)
+print('Saving the model')
+agent.save_model(data_dir)
 input("Press Enter to see the testing...")
 print('****TESTING****')
 test(agent, env, 5)

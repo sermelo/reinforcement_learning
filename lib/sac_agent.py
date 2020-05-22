@@ -69,6 +69,10 @@ class SacAgent(object):
     def save(self, state, action, reward, new_state, fail):
         self.memory.push(state, action, reward, new_state, fail)
 
+    def save_model(self, data_dir):
+        # To be implemented
+        pass
+
     def update(self, num=1):
         for _ in range(num):
             self.__one_update()
