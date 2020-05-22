@@ -5,9 +5,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from lib.noisy_linnear import NoisyLinear
 
-class Actor(nn.Module): 
+class DdpgActor(nn.Module): 
     def __init__(self, input_size, output_size, high, low):
-        super(Actor, self).__init__()
+        super(DdpgActor, self).__init__()
         self.hidden_size = 256
 
         self.low = torch.tensor(low)

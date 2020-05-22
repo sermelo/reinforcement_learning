@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
 
-from lib.actor import Actor
+from lib.ddpg_actor import DdpgActor
 from lib.critic import Critic
 from lib.memory import Memory
 
@@ -17,8 +17,8 @@ class DdpgAgent(object):
         critic_learning_rate=1e-3
         self.critic_loss_fn  = nn.MSELoss()
 
-        self.actor = Actor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
-        self.actor_target = Actor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
+        self.actor = DdpgActor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
+        self.actor_target = DdpgActor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
         for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
             target_param.data.copy_(param.data)
 
