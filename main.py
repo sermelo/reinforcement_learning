@@ -71,15 +71,13 @@ def train(agent, env, num_of_episodes, episodes_show=50):
 
         all_episodes_rewards.append(episode_reward)
 
-
-        test_episode_reward, test_step = test_one_episode(agent, env, show)
-        test_episodes_rewards.append(test_episode_reward)
-
         if show:
-            plot_rewards('Test', test_episodes_rewards)
+            test_episode_reward, test_step = test_one_episode(agent, env, show)
+            test_episodes_rewards.append(test_episode_reward)
+            plot_rewards('Test', test_episodes_rewards, episodes_show)
             plot_rewards('Training', all_episodes_rewards)
 
-def plot_rewards(name, train_rewards):
+def plot_rewards(name, train_rewards, step=1):
     plt.figure(name)
     plt.clf()
     avg_of = 100
@@ -87,7 +85,7 @@ def plot_rewards(name, train_rewards):
     plt.title(f'{name} rewards')
     plt.xlabel('Episode')
     plt.ylabel('Duration')
-    plt.plot(rewards.numpy(), label='Episode reward')
+    plt.plot(range(0, step * rewards.size()[0], step), rewards.numpy(), label='Episode reward')
     if len(rewards) >= avg_of:
         train_means = rewards.unfold(0, avg_of, 1).mean(1).view(-1)
         means_x = list(range(avg_of -1, len(rewards)))
