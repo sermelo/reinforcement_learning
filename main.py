@@ -31,7 +31,7 @@ def test(agent, env, num_of_episodes):
     all_episodes_rewards = 0
     for episode in range(num_of_episodes):
         episode_reward, step = test_one_episode(agent, env, True)
-        print("episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
+        print("Episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
         all_episodes_rewards += episode_reward
     return all_episodes_rewards/num_of_episodes
 
@@ -65,7 +65,7 @@ def train(agent, env, num_of_episodes, episodes_show=50):
             state = new_state
             episode_reward += reward
             if done:
-                print("episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
+                print("Episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
                 break
         agent.update(step)
 
