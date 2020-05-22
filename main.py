@@ -99,7 +99,7 @@ parser.add_argument('--nn-update-rate', dest="nn_update_rate", type=int, default
 
 args = parser.parse_args()
 
-batch_size = 200
+batch_size = 100
 env = gym.make(args.environment_name)
 agent = Agent(env, batch_size)
 print('****TRAINING****')
