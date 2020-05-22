@@ -6,10 +6,6 @@ class Critic(nn.Module):
     def __init__(self, input_size):
         super(Critic, self).__init__()
         self.hidden_size = 256
-        self.gamma = 0.99
-        self.learning_rate = 1e-3
-
-        self.loss_fn = nn.MSELoss()
         self.linear1 = nn.Linear(input_size, self.hidden_size)
         self.linear2 = nn.Linear(self.hidden_size, self.hidden_size)
         self.linear3 = nn.Linear(self.hidden_size, 1)
