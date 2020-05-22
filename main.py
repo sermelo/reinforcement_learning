@@ -123,6 +123,10 @@ parser.add_argument('--alg', dest='algorithm', type=str, choices=supported_algor
                     required=True, help='Algorithm to use to resolve the environment')
 parser.add_argument('--episodes', dest="episodes", type=int, default=100, required=False,
                     help='Number of episodes to run')
+parser.add_argument('--load-model', dest="model_dir", type=str, required=False,
+                    help='Load model from dir')
+
+
 args = parser.parse_args()
 
 ## Define the environment
@@ -144,6 +148,9 @@ elif (args.algorithm == 'SAC'):
 else:
     print('Algorithm not suported')
     sys.exit(1)
+
+if args.model_dir:
+    agent.load_model(args.model_dir)
 
 ## Train
 print('****TRAINING****')

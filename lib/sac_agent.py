@@ -73,6 +73,9 @@ class SacAgent(object):
         # To be implemented
         pass
 
+    def load_model(self, data_dir):
+        pass
+
     def update(self, num=1):
         for _ in range(num):
             self.__one_update()

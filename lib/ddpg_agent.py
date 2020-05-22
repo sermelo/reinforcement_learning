@@ -55,6 +55,9 @@ class DdpgAgent(object):
         critic_dir = os.path.join(data_dir, self.critic_store_dir)
         torch.save(self.critic, critic_dir)
 
+    def load_model(self, data_dir):
+        pass
+
     def update(self, num=1):
         for _ in range(num):
             self.__one_update()
