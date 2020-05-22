@@ -7,7 +7,7 @@ from lib.actor import Actor
 from lib.critic import Critic
 from lib.memory import Memory
 
-class Agent(object):
+class DdpgAgent(object):
     def __init__(self, env, batch_size):
         self.batch_size = batch_size
         self.tau = 1e-2

@@ -6,7 +6,8 @@ import argparse
 import matplotlib.pyplot as plt
 import torch
 
-from lib.agent import Agent
+from lib.ddpg_agent import DdpgAgent
+
 gym.logger.set_level(40)
 
 def test_one_episode(agent, env, render):
@@ -103,7 +104,7 @@ args = parser.parse_args()
 
 batch_size = 100
 env = gym.make(args.environment_name)
-agent = Agent(env, batch_size)
+agent = DdpgAgent(env, batch_size)
 print('****TRAINING****')
 train(agent, env, args.episodes, args.nn_update_rate)
 input("Press Enter to see the testing...")
