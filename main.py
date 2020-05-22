@@ -133,6 +133,7 @@ data_dir_name = f'{args.algorithm}_{args.environment_name}_{time.strftime("%Y_%m
 execution_path = os.path.dirname(__file__)
 data_dir = os.path.join(execution_path, data_dir_name)
 os.mkdir(data_dir)
+print(f'Data dir: {data_dir}')
 
 ## Define the agent
 batch_size = 100
@@ -149,6 +150,7 @@ print('****TRAINING****')
 train(data_dir, agent, env, args.episodes)
 print('Saving the model')
 agent.save_model(data_dir)
+print(f'All data saved in {data_dir}')
 input("Press Enter to see the testing...")
 print('****TESTING****')
 test(agent, env, 5)
