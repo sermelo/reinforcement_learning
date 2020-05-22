@@ -35,7 +35,7 @@ def test(agent, env, num_of_episodes):
         all_episodes_rewards += episode_reward
     return all_episodes_rewards/num_of_episodes
 
-def train(agent, env, num_of_episodes, update_rate):
+def train(agent, env, num_of_episodes):
     episodes_show = 50
     max_steps = env.spec.max_episode_steps
     if max_steps == None:
@@ -63,7 +63,7 @@ def train(agent, env, num_of_episodes, update_rate):
             if done:
                 print("episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
                 break
-        agent.update(update_rate)
+        agent.update(step)
 
         all_episodes_rewards.append(episode_reward)
 
@@ -97,8 +97,6 @@ parser.add_argument('--env', dest='environment_name', type=str, choices=supporte
                     required=True, help='Openai environment')
 parser.add_argument('--episodes', dest="episodes", type=int, default=100, required=False,
                     help='Number of episodes to run')
-parser.add_argument('--nn-update-rate', dest="nn_update_rate", type=int, default=100, required=False,
-                    help='Number of neuronal networks training cicles per episode')
 
 args = parser.parse_args()
 
@@ -106,7 +104,7 @@ batch_size = 100
 env = gym.make(args.environment_name)
 agent = DdpgAgent(env, batch_size)
 print('****TRAINING****')
-train(agent, env, args.episodes, args.nn_update_rate)
+train(agent, env, args.episodes)
 input("Press Enter to see the testing...")
 print('****TESTING****')
 test(agent, env, 5)
