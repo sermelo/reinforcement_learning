@@ -32,7 +32,6 @@ class SacAgent(object):
         self.log_alpha = torch.zeros(1, requires_grad=True)
         self.alpha_optim = optim.Adam([self.log_alpha], lr=self.alpha_lr)
 
-
         self.actor = SacActor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=self.actor_lr)
 
@@ -107,10 +106,10 @@ class SacAgent(object):
                 self.q_net_1.forward(states, new_actions),
                 self.q_net_2.forward(states, new_actions)
             )
-            policy_loss = (self.alpha * log_pi - min_q).mean()
+            actor_loss = (self.alpha * log_pi - min_q).mean()
 
             self.actor_optimizer.zero_grad()
-            policy_loss.backward()
+            actor_loss.backward()
             self.actor_optimizer.step()
 
             # target networks
