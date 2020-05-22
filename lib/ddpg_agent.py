@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -8,6 +9,9 @@ from lib.critic import Critic
 from lib.memory import Memory
 
 class DdpgAgent(object):
+    actor_store_dir = 'actor'
+    critic_store_dir = 'critic'
+
     def __init__(self, env, batch_size):
         self.batch_size = batch_size
         self.tau = 1e-2
@@ -46,8 +50,10 @@ class DdpgAgent(object):
         self.memory.push(state, action, reward, new_state, fail)
 
     def save_model(self, data_dir):
-        # To be implemented
-        pass
+        actor_dir = os.path.join(data_dir, self.actor_store_dir)
+        torch.save(self.actor, actor_dir)
+        critic_dir = os.path.join(data_dir, self.critic_store_dir)
+        torch.save(self.critic, critic_dir)
 
     def update(self, num=1):
         for _ in range(num):
