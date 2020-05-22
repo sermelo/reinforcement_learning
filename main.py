@@ -1,4 +1,6 @@
 import gym
+import safety_gym
+
 import numpy as np
 import argparse
 import matplotlib.pyplot as plt
@@ -88,7 +90,7 @@ def plot_rewards(name, train_rewards):
     plt.legend()
     plt.pause(0.001)
 
-supported_environments = ['Pendulum-v0', 'LunarLanderContinuous-v2', 'BipedalWalker-v3', 'Hopper-v3', 'Walker2d-v3', 'HalfCheetah-v2', 'Ant-v3']
+supported_environments = ['Pendulum-v0', 'LunarLanderContinuous-v2', 'BipedalWalker-v3', 'Hopper-v3', 'Walker2d-v3', 'HalfCheetah-v2', 'Ant-v3', 'Safexp-PointGoal1-v0']
 parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
 parser.add_argument('--env', dest='environment_name', type=str, choices=supported_environments,
                     required=True, help='Openai environment')
