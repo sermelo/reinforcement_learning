@@ -2,6 +2,9 @@ import gym
 import safety_gym
 
 import sys
+import os
+import time
+import csv
 import numpy as np
 import argparse
 import matplotlib.pyplot as plt
@@ -37,7 +40,9 @@ def test(agent, env, num_of_episodes):
         all_episodes_rewards += episode_reward
     return all_episodes_rewards/num_of_episodes
 
-def train(agent, env, num_of_episodes, episodes_show=50):
+def train(data_dir, agent, env, num_of_episodes, episodes_show=50):
+    training_data_file = os.path.join(data_dir, 'training.csv')
+    test_data_file = os.path.join(data_dir, 'test.csv')
     # Define every how many episodes we will show a test and update the graphs
     min_episode_show = int(num_of_episodes / 10)
     if episodes_show > min_episode_show:
@@ -51,33 +56,45 @@ def train(agent, env, num_of_episodes, episodes_show=50):
     avg_rewards = []
     test_episodes_rewards = []
     test_avg_rewards = []
-    for episode in range(num_of_episodes):
-        show = False
-        if episode % episodes_show == 0:
-            show = True
-        state = env.reset()
-        episode_reward = 0
 
-        for step in range(max_steps):
-            # env.render()
-            action = agent.get_action(state)
-            new_state, reward, done, info = env.step(action)
-            fail = done if (step+1) < max_steps else False
-            agent.save(state, action, reward, new_state, fail)
-            state = new_state
-            episode_reward += reward
-            if done:
-                print("Episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
-                break
-        agent.update(step)
+    with open(training_data_file, 'w', newline='') as csvfile:
+        train_writer = csv.writer(csvfile, delimiter=',',
+                                  quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        with open(test_data_file, 'w', newline='') as csvfile:
+            test_writer = csv.writer(csvfile, delimiter=',',
+                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            total_steps = 0
+            for episode in range(num_of_episodes):
+                show = False
+                if episode % episodes_show == 0:
+                    show = True
+                state = env.reset()
+                episode_reward = 0
 
-        all_episodes_rewards.append(episode_reward)
+                for step in range(max_steps):
+                    # env.render()
+                    action = agent.get_action(state)
+                    new_state, reward, done, info = env.step(action)
+                    fail = done if (step+1) < max_steps else False
+                    agent.save(state, action, reward, new_state, fail)
+                    state = new_state
+                    episode_reward += reward
+                    if done:
+                        print("Episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
+                        break
+                agent.update(step)
 
-        if show:
-            test_episode_reward, test_step = test_one_episode(agent, env, show)
-            test_episodes_rewards.append(test_episode_reward)
-            plot_rewards('Test', test_episodes_rewards, episodes_show)
-            plot_rewards('Training', all_episodes_rewards)
+                total_steps += step
+                all_episodes_rewards.append(episode_reward)
+                train_writer.writerow([episode, step, total_steps, episode_reward])
+
+                if show:
+                    test_episode_reward, test_step = test_one_episode(agent, env, show)
+                    test_episodes_rewards.append(test_episode_reward)
+                    test_writer.writerow([episode, test_step, total_steps, test_episode_reward])
+                    plot_rewards('Test', test_episodes_rewards, episodes_show)
+                    plot_rewards('Training', all_episodes_rewards)
+
 
 def plot_rewards(name, train_rewards, step=1):
     plt.figure(name)
@@ -111,6 +128,12 @@ args = parser.parse_args()
 ## Define the environment
 env = gym.make(args.environment_name)
 
+# Create data dir
+data_dir_name = f'{args.algorithm}_{args.environment_name}_{time.strftime("%Y_%m_%d_%H_%M")}'
+execution_path = os.path.dirname(__file__)
+data_dir = os.path.join(execution_path, data_dir_name)
+os.mkdir(data_dir)
+
 ## Define the agent
 batch_size = 100
 if (args.algorithm == 'DDPG'):
@@ -123,7 +146,7 @@ else:
 
 ## Train
 print('****TRAINING****')
-train(agent, env, args.episodes)
+train(data_dir, agent, env, args.episodes)
 input("Press Enter to see the testing...")
 print('****TESTING****')
 test(agent, env, 5)
