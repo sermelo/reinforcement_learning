@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,6 +11,10 @@ from lib.critic import Critic
 from lib.memory import Memory
 
 class SacAgent(object):
+    actor_store_dir = 'actor'
+    q_net_1_store_dir = 'q_1'
+    q_net_2_store_dir = 'q_2'
+
     def __init__(self, env, batch_size):
         self.batch_size = batch_size
         self.tau = 1e-2
@@ -37,16 +42,17 @@ class SacAgent(object):
 
         self.q_net_1 = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
         self.q_net_1_target = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
-        for target_param, param in zip(self.q_net_1_target.parameters(), self.q_net_1.parameters()):
-            target_param.data.copy_(param.data)
+        self.copy_networks(self.q_net_1, self.q_net_1_target)
         self.q_net_1_optimizer = optim.Adam(self.q_net_1.parameters(), lr=self.q_lr)
 
         self.q_net_2 = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
         self.q_net_2_target = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
-        for target_param, param in zip(self.q_net_2_target.parameters(), self.q_net_2.parameters()):
-            target_param.data.copy_(param.data)
+        self.copy_networks(self.q_net_2, self.q_net_2_target)
         self.q_net_2_optimizer = optim.Adam(self.q_net_2.parameters(), lr=self.q_lr)
 
+    def copy_networks(self, org_net, dest_net):
+        for dest_param, param in zip(dest_net.parameters(), org_net.parameters()):
+            dest_param.data.copy_(param.data)
 
     def get_test_action(self, state):
         # 100% deterministic. It is not always the best option to do it this way
@@ -70,11 +76,24 @@ class SacAgent(object):
         self.memory.push(state, action, reward, new_state, fail)
 
     def save_model(self, data_dir):
-        # To be implemented
-        pass
+        actor_dir = os.path.join(data_dir, self.actor_store_dir)
+        torch.save(self.actor, actor_dir)
+        q_net_1_dir = os.path.join(data_dir, self.q_net_1_store_dir)
+        torch.save(self.q_net_1, q_net_1_dir)
+        q_net_2_dir = os.path.join(data_dir, self.q_net_2_store_dir)
+        torch.save(self.q_net_2, q_net_2_dir)
 
     def load_model(self, data_dir):
-        pass
+        actor_dir = os.path.join(data_dir, self.actor_store_dir)
+        self.actor = torch.load(actor_dir)
+
+        q_net_1_dir = os.path.join(data_dir, self.q_net_1_store_dir)
+        self.q_net_1 = torch.load(q_net_1_dir)
+        self.copy_networks(self.q_net_1, self.q_net_1_target)
+
+        q_net_2_dir = os.path.join(data_dir, self.q_net_2_store_dir)
+        self.q_net_2 = torch.load(q_net_2_dir)
+        self.copy_networks(self.q_net_2, self.q_net_2_target)
 
     def update(self, num=1):
         for _ in range(num):
