@@ -82,7 +82,7 @@ class DdpgAgent(object):
         next_states_q_value = self.critic_target.forward(next_states, next_actions.detach())
         not_fails = (fails == 0).view(fails.size()[0], 1)
         next_states_q_value = next_states_q_value * not_fails
-        new_q_value = rewards + (self.gamma * next_states_q_value)
+        new_q_value = rewards - costs + (self.gamma * next_states_q_value)
         critic_loss = self.critic_loss_fn(states_q_values, new_q_value)
 
         actor_loss = -self.critic.forward(states, self.actor.forward(states)).mean()
