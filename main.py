@@ -140,6 +140,8 @@ parser.add_argument('--load-model', dest="model_dir", type=str, required=False,
                     help='Load model from dir')
 parser.add_argument('--max-steps', dest="max_steps", type=int, required=False, default=500,
                     help='Max steps per episode')
+parser.add_argument('--test', dest="just_test", required=False, default=False, action='store_true',
+                    help='Execute just tests. This option is remcomended with load-model option')
 
 
 args = parser.parse_args()
@@ -167,14 +169,18 @@ else:
 if args.model_dir:
     agent.load_model(args.model_dir)
 
-## Train
-print('****TRAINING****')
-train(data_dir, agent, env, args.episodes, args.max_steps)
-print('Saving the model')
-agent.save_model(data_dir)
-print(f'All data saved in {data_dir}')
-input("Press Enter to see the testing...")
-print('****TESTING****')
-test(agent, env, 5, args.max_steps)
+if args.just_test:
+    test(agent, env, args.episodes, args.max_steps)
+else:
+    ## Train
+    print('****TRAINING****')
+    train(data_dir, agent, env, args.episodes, args.max_steps)
+    print('Saving the model')
+    agent.save_model(data_dir)
+    print(f'All data saved in {data_dir}')
+    input("Press Enter to see the testing...")
+    print('****TESTING****')
+    test(agent, env, 5, args.max_steps)
+
 env.close()
 input("Press Enter to end...")
