@@ -24,10 +24,8 @@ def get_max_steps(max_steps, env):
     return max_steps
 
 def test_one_episode(agent, env, render, max_steps):
-    max_steps = get_max_steps(max_steps, env)
     state = env.reset()
     episode_reward = 0
-
     for step in range(max_steps):
         if render:
             env.render()
@@ -44,6 +42,7 @@ def test_one_episode(agent, env, render, max_steps):
 
 def test(agent, env, num_of_episodes, max_steps):
     all_episodes_rewards = 0
+    max_steps = get_max_steps(max_steps, env)
     for episode in range(num_of_episodes):
         episode_reward, step, fail = test_one_episode(agent, env, True, max_steps)
         print(f'Episode: {episode}, step: {step}, reward: {episode_reward}, fail: {fail}')
@@ -78,7 +77,6 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                     show = True
                 state = env.reset()
                 episode_reward = 0
-
                 for step in range(max_steps):
                     # env.render()
                     action = agent.get_action(state)
