@@ -180,10 +180,13 @@ if args.just_test:
 else:
     ## Train
     print('****TRAINING****')
-    train(data_dir, agent, env, args.episodes, args.max_steps)
-    print('Saving the model')
-    agent.save_model(data_dir)
-    print(f'All data saved in {data_dir}')
+    try:
+        train(data_dir, agent, env, args.episodes, args.max_steps)
+    finally:
+        print('Saving the model')
+        agent.save_model(data_dir)
+        print(f'All data saved in {data_dir}')
+
     input("Press Enter to see the testing...")
     print('****TESTING****')
     test(agent, env, 5, args.max_steps)
