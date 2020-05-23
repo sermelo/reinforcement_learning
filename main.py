@@ -108,7 +108,7 @@ def plot_rewards(name, train_rewards, avg_of, step=1):
     rewards = torch.tensor(train_rewards, dtype=torch.float)
     plt.title(f'{name} rewards')
     plt.xlabel('Episode')
-    plt.ylabel('Duration')
+    plt.ylabel('Reward')
     plt.plot(range(0, step * rewards.size()[0], step), rewards.numpy(), label='Episode reward')
     if len(rewards) >= avg_of:
         train_means = rewards.unfold(0, avg_of, 1).mean(1).view(-1)
