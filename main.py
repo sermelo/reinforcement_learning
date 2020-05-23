@@ -92,14 +92,13 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                     test_episode_reward, test_step = test_one_episode(agent, env, show, max_steps)
                     test_episodes_rewards.append(test_episode_reward)
                     test_writer.writerow([episode, test_step, total_steps, test_episode_reward])
-                    plot_rewards('Test', test_episodes_rewards, episodes_show)
-                    plot_rewards('Training', all_episodes_rewards)
+                    plot_rewards('Test', test_episodes_rewards, episodes_show, episodes_show)
+                    plot_rewards('Training', all_episodes_rewards, episodes_show)
 
 
-def plot_rewards(name, train_rewards, step=1):
+def plot_rewards(name, train_rewards, avg_of, step=1):
     plt.figure(name)
     plt.clf()
-    avg_of = 100
     rewards = torch.tensor(train_rewards, dtype=torch.float)
     plt.title(f'{name} rewards')
     plt.xlabel('Episode')
