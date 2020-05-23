@@ -72,8 +72,8 @@ class SacAgent(object):
         return action * (self.action_range[1] - self.action_range[0]) / 2.0 +\
             (self.action_range[1] + self.action_range[0]) / 2.0
 
-    def save(self, state, action, reward, new_state, fail):
-        self.memory.push(state, action, reward, new_state, fail)
+    def save(self, state, action, reward, new_state, cost, fail):
+        self.memory.push(state, action, reward, new_state, cost, fail)
 
     def save_model(self, data_dir):
         actor_dir = os.path.join(data_dir, self.actor_store_dir)
@@ -102,7 +102,7 @@ class SacAgent(object):
     def __one_update(self):
         if (len(self.memory) < self.batch_size):
             return
-        states, actions, rewards, next_states, fails = self.memory.get_batch(self.batch_size)
+        states, actions, rewards, next_states, costs, fails = self.memory.get_batch(self.batch_size)
         not_fails = (fails == 0).view(fails.size()[0], 1)
 
         next_actions, next_log_pi = self.actor.sample(next_states)

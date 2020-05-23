@@ -49,8 +49,8 @@ class DdpgAgent(object):
         tensor_action = self.actor.forward(tensor_state)
         return tensor_action.detach().numpy()[0]
 
-    def save(self, state, action, reward, new_state, fail):
-        self.memory.push(state, action, reward, new_state, fail)
+    def save(self, state, action, reward, new_state, cost, fail):
+        self.memory.push(state, action, reward, new_state, cost, fail)
 
     def save_model(self, data_dir):
         actor_dir = os.path.join(data_dir, self.actor_store_dir)
@@ -75,7 +75,7 @@ class DdpgAgent(object):
     def __one_update(self):
         if (len(self.memory) < self.batch_size):
             return
-        states, actions, rewards, next_states, fails = self.memory.get_batch(self.batch_size)
+        states, actions, rewards, next_states, costs, fails = self.memory.get_batch(self.batch_size)
 
         states_q_values = self.critic.forward(states, actions)
         next_actions = self.actor_target.forward(next_states)
