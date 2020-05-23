@@ -36,16 +36,17 @@ def test_one_episode(agent, env, render, max_steps):
         if 'cost' in info:
             if info['cost'] > 0:
                 done = True
+        fail = done if (step+1) < max_steps else False
         episode_reward += reward
         if done:
             break
-    return episode_reward, step
+    return episode_reward, step, fail
 
 def test(agent, env, num_of_episodes, max_steps):
     all_episodes_rewards = 0
     for episode in range(num_of_episodes):
-        episode_reward, step = test_one_episode(agent, env, True, max_steps)
-        print("Episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
+        episode_reward, step, fail = test_one_episode(agent, env, True, max_steps)
+        print(f'Episode: {episode}, step: {step}, reward: {episode_reward}, fail: {fail}')
         all_episodes_rewards += episode_reward
     return all_episodes_rewards/num_of_episodes
 
@@ -91,7 +92,7 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                     episode_reward += reward
                     if done:
                         break
-                print("Episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
+                print(f'Episode: {episode}, step: {step}, reward: {episode_reward}, fail: {fail}')
                 agent.update(step)
 
                 total_steps += step
@@ -99,7 +100,7 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                 train_writer.writerow([episode, step, total_steps, episode_reward])
 
                 if show:
-                    test_episode_reward, test_step = test_one_episode(agent, env, show, max_steps)
+                    test_episode_reward, test_step, fail = test_one_episode(agent, env, show, max_steps)
                     test_episodes_rewards.append(test_episode_reward)
                     test_writer.writerow([episode, test_step, total_steps, test_episode_reward])
                     plot_rewards('Test', test_episodes_rewards, episodes_show, episodes_show)
