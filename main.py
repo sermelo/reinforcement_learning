@@ -52,13 +52,13 @@ def run_one_episode(agent, env, render, test, max_steps):
     return episode_reward, step, episode_cost, fail
 
 def test(agent, env, num_of_episodes, max_steps):
-    all_episodes_rewards = 0
+    all_rewards = 0
     max_steps = get_max_steps(max_steps, env)
     for episode in range(num_of_episodes):
-        episode_reward, step, cost, fail = run_one_episode(agent, env, True, True, max_steps)
-        print(f'Episode: {episode}, step: {step}, reward: {episode_reward}, cost: {cost}, fail: {fail}')
-        all_episodes_rewards += episode_reward
-    return all_episodes_rewards/num_of_episodes
+        reward, step, cost, fail = run_one_episode(agent, env, True, True, max_steps)
+        print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}')
+        all_rewards += reward
+    return all_rewards/num_of_episodes
 
 def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
     training_data_file = os.path.join(data_dir, 'training.csv')
@@ -70,9 +70,9 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
 
     max_steps = get_max_steps(max_steps, env)
 
-    all_episodes_rewards = []
+    all_rewards = []
     avg_rewards = []
-    test_episodes_rewards = []
+    test_rewards = []
     test_avg_rewards = []
 
     with open(training_data_file, 'w', newline='') as csvfile:
@@ -86,20 +86,20 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                 show = False
                 if episode % episodes_show == 0:
                     show = True
-                episode_reward, step, cost, fail = run_one_episode(agent, env, False, False, max_steps)
-                print(f'Episode: {episode}, step: {step}, reward: {episode_reward}, cost: {cost}, fail: {fail}')
+                reward, step, cost, fail = run_one_episode(agent, env, False, False, max_steps)
+                print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}')
                 agent.update(step)
 
                 total_steps += step
-                all_episodes_rewards.append(episode_reward)
-                train_writer.writerow([episode, step, total_steps, episode_reward, cost])
+                all_rewards.append(reward)
+                train_writer.writerow([episode, step, total_steps, reward, cost])
 
                 if show:
-                    test_episode_reward, test_step, cost, fail = run_one_episode(agent, env, show, True, max_steps)
-                    test_episodes_rewards.append(test_episode_reward)
-                    test_writer.writerow([episode, test_step, total_steps, test_episode_reward, cost])
-                    plot_rewards('Test', test_episodes_rewards, episodes_show, episodes_show)
-                    plot_rewards('Training', all_episodes_rewards, episodes_show)
+                    test_reward, test_step, cost, fail = run_one_episode(agent, env, show, True, max_steps)
+                    test_rewards.append(test_reward)
+                    test_writer.writerow([episode, test_step, total_steps, test_reward, cost])
+                    plot_rewards('Test', test_rewards, episodes_show, episodes_show)
+                    plot_rewards('Training', all_rewards, episodes_show)
 
 
 def plot_rewards(name, train_rewards, avg_of, step=1):
