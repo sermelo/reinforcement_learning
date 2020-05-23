@@ -33,6 +33,9 @@ def test_one_episode(agent, env, render, max_steps):
             env.render()
         action = agent.get_test_action(state)
         state, reward, done, info = env.step(action)
+        if 'cost' in info:
+            if info['cost'] > 0:
+                done = True
         episode_reward += reward
         if done:
             break
@@ -79,6 +82,9 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                     # env.render()
                     action = agent.get_action(state)
                     new_state, reward, done, info = env.step(action)
+                    if 'cost' in info:
+                        if info['cost'] > 0:
+                            done = True
                     fail = done if (step+1) < max_steps else False
                     agent.save(state, action, reward, new_state, fail)
                     state = new_state
