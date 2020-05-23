@@ -112,6 +112,8 @@ def plot_rewards(name, train_rewards, avg_of, step=1):
     plt.pause(0.001)
 
 ## Prepare the input arguments
+supported_algorithms = ['DDPG', 'SAC']
+
 supported_environments = [
         'Pendulum-v0',
         'LunarLanderContinuous-v2',
@@ -120,10 +122,12 @@ supported_environments = [
         'Walker2d-v3',
         'HalfCheetah-v2',
         'Ant-v3',
-        'Safexp-PointGoal1-v0',
-        'Safexp-CarGoal1-v0'
 ]
-supported_algorithms = ['DDPG', 'SAC']
+# Add all safetygym environments
+for aim in ['Goal', 'Button', 'Push']:
+    for level in [0, 1, 2]:
+        for robot in ['Point', 'Car', 'Doggo']:
+            supported_environments.append(f'Safexp-{robot}{aim}{level}-v0')
 
 parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
 parser.add_argument('--env', dest='environment_name', type=str, choices=supported_environments,
