@@ -140,7 +140,7 @@ parser.add_argument('--episodes', dest="episodes", type=int, default=100, requir
                     help='Number of episodes to run')
 parser.add_argument('--load-model', dest="model_dir", type=str, required=False,
                     help='Load model from dir')
-parser.add_argument('--max-steps', dest="max_steps", type=int, required=False, default=500,
+parser.add_argument('--max-steps', dest="max_steps", type=int, required=False, default=1000,
                     help='Max steps per episode')
 parser.add_argument('--test', dest="just_test", required=False, default=False, action='store_true',
                     help='Execute just tests. This option is remcomended with load-model option')
