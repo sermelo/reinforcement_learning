@@ -28,7 +28,7 @@ class Memory(object):
             next_states.append(next_state)
             costs.append(cost)
             fails.append(fail)
-        return torch.FloatTensor(states), torch.FloatTensor(actions), torch.FloatTensor(rewards), torch.FloatTensor(next_states), torch.FloatTensor(costs), torch.FloatTensor(fails)
+        return torch.FloatTensor(states), torch.FloatTensor(actions), torch.FloatTensor(rewards), torch.FloatTensor(next_states), torch.FloatTensor(costs), torch.BoolTensor(fails)
 
     def __len__(self):
         return len(self.buffer)
