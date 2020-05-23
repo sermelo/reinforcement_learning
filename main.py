@@ -15,10 +15,16 @@ from lib.sac_agent import SacAgent
 
 gym.logger.set_level(40)
 
-def test_one_episode(agent, env, render, max_steps):
+def get_max_steps(max_steps, env):
     env_max_steps = env.spec.max_episode_steps
+    print(f'Environment max steps: {env_max_steps}')
     if env_max_steps != None and env_max_steps < max_steps:
         max_steps = env_max_steps
+    print(f'Configured max steps value to: {max_steps}')
+    return max_steps
+
+def test_one_episode(agent, env, render, max_steps):
+    max_steps = get_max_steps(max_steps, env)
     state = env.reset()
     episode_reward = 0
 
@@ -48,9 +54,7 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
     if episodes_show > min_episode_show:
         episodes_show = min_episode_show
 
-    env_max_steps = env.spec.max_episode_steps
-    if env_max_steps != None and env_max_steps < max_steps:
-        max_steps = env_max_steps
+    max_steps = get_max_steps(max_steps, env)
 
     all_episodes_rewards = []
     avg_rewards = []
