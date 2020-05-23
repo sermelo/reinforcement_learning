@@ -108,7 +108,7 @@ def plot_rewards(name, train_rewards, avg_of, step=1):
     plt.plot(range(0, step * rewards.size()[0], step), rewards.numpy(), label='Episode reward')
     if len(rewards) >= avg_of:
         train_means = rewards.unfold(0, avg_of, 1).mean(1).view(-1)
-        means_x = list(range(avg_of -1, len(rewards)))
+        means_x = list(range(step * (avg_of - 1), step * (len(rewards)), step))
         plt.plot(means_x, train_means.numpy(), label=f'{avg_of} episodes avg reward')
     plt.legend()
     plt.pause(0.001)
