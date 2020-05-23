@@ -80,8 +80,8 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                     state = new_state
                     episode_reward += reward
                     if done:
-                        print("Episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
                         break
+                print("Episode: {}, step: {}, reward: {}".format(episode, step, episode_reward))
                 agent.update(step)
 
                 total_steps += step
