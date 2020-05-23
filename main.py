@@ -113,7 +113,17 @@ def plot_rewards(name, train_rewards, step=1):
     plt.pause(0.001)
 
 ## Prepare the input arguments
-supported_environments = ['Pendulum-v0', 'LunarLanderContinuous-v2', 'BipedalWalker-v3', 'Hopper-v3', 'Walker2d-v3', 'HalfCheetah-v2', 'Ant-v3', 'Safexp-PointGoal1-v0']
+supported_environments = [
+        'Pendulum-v0',
+        'LunarLanderContinuous-v2',
+        'BipedalWalker-v3',
+        'Hopper-v3',
+        'Walker2d-v3',
+        'HalfCheetah-v2',
+        'Ant-v3',
+        'Safexp-PointGoal1-v0',
+        'Safexp-CarGoal1-v0'
+]
 supported_algorithms = ['DDPG', 'SAC']
 
 parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
