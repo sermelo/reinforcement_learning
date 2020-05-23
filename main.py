@@ -91,12 +91,12 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                 agent.update(step)
 
                 total_steps += step
-                all_rewards.append(reward)
+                all_rewards.append(reward - cost)
                 train_writer.writerow([episode, step, total_steps, reward, cost])
 
                 if show:
                     test_reward, test_step, cost, fail = run_one_episode(agent, env, show, True, max_steps)
-                    test_rewards.append(test_reward)
+                    test_rewards.append(test_reward - cost)
                     test_writer.writerow([episode, test_step, total_steps, test_reward, cost])
                     plot_rewards('Test', test_rewards, episodes_show, episodes_show)
                     plot_rewards('Training', all_rewards, episodes_show)
