@@ -88,7 +88,6 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                     show = True
                 reward, step, cost, fail = run_one_episode(agent, env, False, False, max_steps)
                 print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}')
-                agent.update(step)
 
                 total_steps += step
                 all_rewards.append(reward - cost)
@@ -100,6 +99,7 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                     test_writer.writerow([episode, test_step, total_steps, test_reward, cost])
                     plot_rewards('Test', test_rewards, episodes_show, episodes_show)
                     plot_rewards('Training', all_rewards, episodes_show)
+                agent.update(step)
 
 
 def plot_rewards(name, train_rewards, avg_of, step=1):
