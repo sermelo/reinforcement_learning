@@ -3,10 +3,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class Critic(nn.Module):
-    def __init__(self, input_size):
+    def __init__(self, state_input_size, action_input_size):
         super(Critic, self).__init__()
         self.hidden_size = 256
-        self.linear1 = nn.Linear(input_size, self.hidden_size)
+        self.linear1 = nn.Linear(state_input_size + action_input_size, self.hidden_size)
         self.linear2 = nn.Linear(self.hidden_size, self.hidden_size)
         self.linear3 = nn.Linear(self.hidden_size, 1)
 

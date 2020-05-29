@@ -40,13 +40,13 @@ class SacAgent(object):
         self.actor = SacActor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=self.actor_lr)
 
-        self.q_net_1 = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
-        self.q_net_1_target = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
+        self.q_net_1 = Critic(env.observation_space.shape[0], env.action_space.shape[0])
+        self.q_net_1_target = Critic(env.observation_space.shape[0], env.action_space.shape[0])
         self.copy_networks(self.q_net_1, self.q_net_1_target)
         self.q_net_1_optimizer = optim.Adam(self.q_net_1.parameters(), lr=self.q_lr)
 
-        self.q_net_2 = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
-        self.q_net_2_target = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
+        self.q_net_2 = Critic(env.observation_space.shape[0], env.action_space.shape[0])
+        self.q_net_2_target = Critic(env.observation_space.shape[0], env.action_space.shape[0])
         self.copy_networks(self.q_net_2, self.q_net_2_target)
         self.q_net_2_optimizer = optim.Adam(self.q_net_2.parameters(), lr=self.q_lr)
 

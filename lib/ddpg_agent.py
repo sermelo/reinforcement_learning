@@ -25,8 +25,8 @@ class DdpgAgent(object):
         self.actor_target = DdpgActor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
         self.copy_networks(self.actor, self.actor_target)
 
-        self.critic = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
-        self.critic_target = Critic(env.observation_space.shape[0] + env.action_space.shape[0])
+        self.critic = Critic(env.observation_space.shape[0], env.action_space.shape[0])
+        self.critic_target = Critic(env.observation_space.shape[0], env.action_space.shape[0])
         self.copy_networks(self.critic, self.critic_target)
 
         self.memory = Memory(memory_size)
