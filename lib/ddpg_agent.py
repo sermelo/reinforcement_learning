@@ -15,7 +15,7 @@ class DdpgAgent(object):
     def __init__(self, env, batch_size):
         self.batch_size = batch_size
         self.tau = 1e-2
-        memory_size = 50000
+        memory_size = 1000000
         self.gamma = 0.99
         actor_learning_rate=1e-4
         critic_learning_rate=1e-3

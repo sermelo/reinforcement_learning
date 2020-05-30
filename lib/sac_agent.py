@@ -18,7 +18,7 @@ class SacAgent(object):
     def __init__(self, env, batch_size):
         self.batch_size = batch_size
         self.tau = 1e-2
-        memory_size = 50000
+        memory_size = 1000000
         self.gamma = 0.99
         self.q_lr = 3e-4
         self.actor_lr = 3e-4
