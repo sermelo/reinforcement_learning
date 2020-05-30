@@ -103,7 +103,7 @@ class SacAgent(object):
         if (len(self.memory) < self.batch_size):
             return
         states, actions, rewards, next_states, costs, fails = self.memory.get_batch(self.batch_size)
-        not_fails = (fails == 0).view(fails.size()[0], 1)
+        not_fails = (fails == 0)
 
         next_actions, next_log_pi = self.actor.sample(next_states)
 

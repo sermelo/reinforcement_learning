@@ -8,7 +8,7 @@ class Memory(object):
         self.buffer = deque(maxlen=size)
 
     def push(self, state, action, reward, next_state, cost, fail):
-        self.buffer.append((state, action, [reward], next_state, [cost], fail))
+        self.buffer.append((state, action, [reward], next_state, [cost], [fail]))
 
     def get_batch(self, batch_size):
         states = []
