@@ -75,11 +75,11 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
     test_rewards = []
     test_avg_rewards = []
 
-    with open(training_data_file, 'w', newline='') as csvfile:
-        train_writer = csv.writer(csvfile, delimiter=',',
+    with open(training_data_file, 'w', newline='') as train_csvfile:
+        train_writer = csv.writer(train_csvfile, delimiter=',',
                                   quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        with open(test_data_file, 'w', newline='') as csvfile:
-            test_writer = csv.writer(csvfile, delimiter=',',
+        with open(test_data_file, 'w', newline='') as test_csvfile:
+            test_writer = csv.writer(test_csvfile, delimiter=',',
                                      quotechar='|', quoting=csv.QUOTE_MINIMAL)
             total_steps = 0
             for episode in range(num_of_episodes):
