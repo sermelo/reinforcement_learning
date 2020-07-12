@@ -47,6 +47,7 @@ def run_one_episode(agent, env, render, test, max_steps):
         fail = done if (step+1) < max_steps else False
         if not test:
             agent.save(old_state, action, reward, new_state, cost, fail)
+            agent.update()
         old_state = new_state
         episode_reward += reward
         if done:
@@ -101,8 +102,6 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                     test_writer.writerow([episode, test_step, total_steps, test_reward, cost])
                     plot_rewards('Test', test_rewards, episodes_show, episodes_show)
                     plot_rewards('Training', all_rewards, episodes_show)
-                agent.update(step)
-
 
 def plot_rewards(name, train_rewards, avg_of, step=1):
     plt.figure(name)
