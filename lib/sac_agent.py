@@ -8,6 +8,7 @@ from torch.distributions import Normal
 
 from lib.sac_actor import SacActor
 from lib.critic import Critic
+from lib.cost import Cost
 from lib.memory import Memory
 
 class SacAgent(object):
@@ -22,10 +23,13 @@ class SacAgent(object):
         self.gamma = 0.99
         self.q_lr = 3e-4
         self.actor_lr = 3e-4
+        #self.alpha_lr = 3e-4
         self.alpha_lr = 3e-3
 
         self.update_step = 0
         self.delay_step = 2
+
+        self.max_q = 0
 
         self.action_range = [env.action_space.low, env.action_space.high]
 
@@ -49,6 +53,9 @@ class SacAgent(object):
         self.q_net_2_target = Critic(env.observation_space.shape[0], env.action_space.shape[0])
         self.copy_networks(self.q_net_2, self.q_net_2_target)
         self.q_net_2_optimizer = optim.Adam(self.q_net_2.parameters(), lr=self.q_lr)
+
+        self.cost = Cost(env.observation_space.shape[0], env.action_space.shape[0])
+        self.cost_optimizer = optim.Adam(self.cost.parameters(), lr=self.q_lr)
 
     def copy_networks(self, org_net, dest_net):
         for dest_param, param in zip(dest_net.parameters(), org_net.parameters()):
@@ -102,15 +109,21 @@ class SacAgent(object):
     def __one_update(self):
         if (len(self.memory) < self.batch_size):
             return
+        #self._train_cost_network()
         states, actions, rewards, next_states, costs, fails = self.memory.get_batch(self.batch_size)
+        #states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size, 0.80)
+        if len(states) == 0:
+            return
         not_fails = (fails == 0)
+        no_constrain = (costs == 0)
 
         next_actions, next_log_pi = self.actor.sample(next_states)
 
         next_q_1 = self.q_net_1_target(next_states, next_actions)
         next_q_2 = self.q_net_2_target(next_states, next_actions)
         next_q_target = torch.min(next_q_1, next_q_2) - self.alpha * next_log_pi
-        expected_q = rewards - costs + not_fails * self.gamma * next_q_target
+        self.max_q = max(self.max_q , torch.max(next_q_target)).detach()
+        expected_q = rewards - (2 * self.max_q * costs) + (not_fails * self.gamma * next_q_target)
 
         curr_q_1 = self.q_net_1.forward(states, actions)
         curr_q_2 = self.q_net_2.forward(states, actions)
@@ -138,6 +151,7 @@ class SacAgent(object):
             actor_loss.backward()
             self.actor_optimizer.step()
 
+
             # target networks
             for target_param, param in zip(self.q_net_1_target.parameters(), self.q_net_1.parameters()):
                 target_param.data.copy_(self.tau * param + (1 - self.tau) * target_param)
@@ -155,4 +169,26 @@ class SacAgent(object):
         self.alpha = self.log_alpha.exp()
 
         self.update_step += 1
+
+
+    def _train_cost_network(self):
+        states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size)
+        if len(states) > 0:
+            predicted_costs = self.cost.forward(states, actions)
+
+            criterion = nn.BCELoss()
+            loss = criterion(predicted_costs, costs)
+            self.cost_optimizer.zero_grad()
+            loss.backward()
+            self.cost_optimizer.step()
+
+            new_actions, log_pi = self.actor.sample(states)
+            predicted_costs = self.cost.forward(states, new_actions)
+            criterion = nn.BCELoss()
+            actor_loss = criterion(predicted_costs, torch.zeros(predicted_costs.size()))
+            actor_loss = predicted_costs.mean()
+            self.actor_optimizer.zero_grad()
+            actor_loss.backward()
+            self.actor_optimizer.step()
+
 
