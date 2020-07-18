@@ -74,9 +74,9 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
     max_steps = get_max_steps(max_steps, env)
 
     all_rewards = []
-    avg_rewards = []
-    test_rewards = []
-    test_avg_rewards = []
+    all_costs = []
+    all_test_rewards = []
+    all_test_costs = []
 
     with open(training_data_file, 'w', newline='') as train_csvfile:
         train_writer = csv.writer(train_csvfile, delimiter=',',
@@ -93,23 +93,27 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                 print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}')
 
                 total_steps += step
-                all_rewards.append(reward - cost)
+                all_rewards.append(reward)
+                all_costs.append(cost)
                 train_writer.writerow([episode, step, total_steps, reward, cost])
 
                 if show:
-                    test_reward, test_step, cost, fail = run_one_episode(agent, env, show, True, max_steps)
-                    test_rewards.append(test_reward - cost)
-                    test_writer.writerow([episode, test_step, total_steps, test_reward, cost])
-                    plot_rewards('Test', test_rewards, episodes_show, episodes_show)
-                    plot_rewards('Training', all_rewards, episodes_show)
+                    reward, step, cost, fail = run_one_episode(agent, env, show, True, max_steps)
+                    all_test_rewards.append(reward - cost)
+                    all_test_costs.append(cost)
+                    test_writer.writerow([episode, step, total_steps, reward, cost])
+                    plot_rewards('Test rewards', all_test_rewards, episodes_show, episodes_show)
+                    plot_rewards('Test costs', all_test_costs, episodes_show, episodes_show)
+                    plot_rewards('Training rewards', all_rewards, episodes_show)
+                    plot_rewards('Training costs', all_costs, episodes_show)
 
 def plot_rewards(name, train_rewards, avg_of, step=1):
     plt.figure(name)
     plt.clf()
     rewards = torch.tensor(train_rewards, dtype=torch.float)
-    plt.title(f'{name} rewards')
+    plt.title(f'{name}')
     plt.xlabel('Episode')
-    plt.ylabel('Reward')
+    plt.ylabel('Points')
     plt.plot(range(0, step * rewards.size()[0], step), rewards.numpy(), label='Episode reward')
     if len(rewards) >= avg_of:
         train_means = rewards.unfold(0, avg_of, 1).mean(1).view(-1)
