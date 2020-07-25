@@ -90,7 +90,7 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                 if episode % episodes_show == 0:
                     show = True
                 reward, step, cost, fail = run_one_episode(agent, env, False, False, max_steps)
-                print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}')
+                print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}, cost/reward ratio: {cost/reward}')
 
                 total_steps += step
                 all_rewards.append(reward)
