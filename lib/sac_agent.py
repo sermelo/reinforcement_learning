@@ -113,9 +113,12 @@ class SacAgent(object):
     def __one_update(self):
         if (len(self.memory) < self.batch_size):
             return
-        self.train_cost_net()
 
-        states, actions, rewards, next_states, costs, fails = self.memory.get_batch(self.batch_size)
+        states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size, 0.75)
+        if len(states) == 0:
+            return
+
+        self.train_cost_net(states, actions, rewards, next_states, costs, fails)
         not_fails = (fails == 0)
 
         next_actions, next_log_pi = self.actor.sample(next_states)
@@ -173,28 +176,24 @@ class SacAgent(object):
 
         self.update_step += 1
 
-    def train_cost_net(self):
-        states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size)
-        costs = costs * 15
-        if len(states) > 0:
+    def train_cost_net(self, states, actions, rewards, next_states, costs, fails):
+        next_actions, next_log_pi = self.actor.sample(next_states)
 
-            next_actions, next_log_pi = self.actor.sample(next_states)
+        next_cost_1 = self.cost_net_1_target(next_states, next_actions)
+        next_cost_2 = self.cost_net_2_target(next_states, next_actions)
+        next_cost_target = torch.max(next_cost_1, next_cost_2) - self.alpha * next_log_pi
+        expected_cost = costs + self.cost_gamma * next_cost_target
 
-            next_cost_1 = self.cost_net_1_target(next_states, next_actions)
-            next_cost_2 = self.cost_net_2_target(next_states, next_actions)
-            next_cost_target = torch.max(next_cost_1, next_cost_2) - self.alpha * next_log_pi
-            expected_cost = costs + self.cost_gamma * next_cost_target
+        curr_cost_1 = self.cost_net_1.forward(states, actions)
+        curr_cost_2 = self.cost_net_2.forward(states, actions)
+        cost1_loss = F.mse_loss(curr_cost_1, expected_cost.detach())
+        cost2_loss = F.mse_loss(curr_cost_2, expected_cost.detach())
 
-            curr_cost_1 = self.cost_net_1.forward(states, actions)
-            curr_cost_2 = self.cost_net_2.forward(states, actions)
-            cost1_loss = F.mse_loss(curr_cost_1, expected_cost.detach())
-            cost2_loss = F.mse_loss(curr_cost_2, expected_cost.detach())
+        self.cost_net_1_optimizer.zero_grad()
+        cost1_loss.backward()
+        self.cost_net_1_optimizer.step()
 
-            self.cost_net_1_optimizer.zero_grad()
-            cost1_loss.backward()
-            self.cost_net_1_optimizer.step()
-
-            self.cost_net_2_optimizer.zero_grad()
-            cost2_loss.backward()
-            self.cost_net_2_optimizer.step()
+        self.cost_net_2_optimizer.zero_grad()
+        cost2_loss.backward()
+        self.cost_net_2_optimizer.step()
 
