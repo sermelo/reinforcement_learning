@@ -181,7 +181,7 @@ class SacAgent(object):
 
         next_cost_1 = self.cost_net_1_target(next_states, next_actions)
         next_cost_2 = self.cost_net_2_target(next_states, next_actions)
-        next_cost_target = torch.max(next_cost_1, next_cost_2) - self.alpha * next_log_pi
+        next_cost_target = torch.max(next_cost_1, next_cost_2)
         expected_cost = costs + self.cost_gamma * next_cost_target
 
         curr_cost_1 = self.cost_net_1.forward(states, actions)
