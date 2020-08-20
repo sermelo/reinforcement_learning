@@ -25,12 +25,12 @@ def get_max_steps(max_steps, env):
     print(f'Configured max steps value to: {max_steps}')
     return max_steps
 
-def run_one_episode(agent, env, render, test, max_steps):
+def run_one_episode(agent, env, render, test, max_steps, data_file=None):
     old_state = env.reset()
     episode_reward = 0
     episode_cost = 0
+    cost = 0
     for step in range(max_steps):
-        cost = 0
 
         if render:
             env.render()
@@ -48,6 +48,8 @@ def run_one_episode(agent, env, render, test, max_steps):
         if not test:
             agent.save(old_state, action, reward, new_state, cost, fail)
             agent.update()
+        if data_file:
+            data_file.writerow([step, old_state, action, reward, new_state, cost, fail])
         old_state = new_state
         episode_reward += reward
         if done:
@@ -89,19 +91,17 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
                 show = False
                 if episode % episodes_show == 0:
                     show = True
-                reward, step, cost, fail = run_one_episode(agent, env, False, False, max_steps)
+                reward, step, cost, fail = run_one_episode(agent, env, False, False, max_steps, train_writer)
                 print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}, cost/reward ratio: {cost/reward}')
 
                 total_steps += step
                 all_rewards.append(reward)
                 all_costs.append(cost)
-                train_writer.writerow([episode, step, total_steps, reward, cost])
 
                 if show:
-                    reward, step, cost, fail = run_one_episode(agent, env, show, True, max_steps)
+                    reward, step, cost, fail = run_one_episode(agent, env, show, True, max_steps, test_writer)
                     all_test_rewards.append(reward - cost)
                     all_test_costs.append(cost)
-                    test_writer.writerow([episode, step, total_steps, reward, cost])
                     plot_rewards('Test rewards', all_test_rewards, episodes_show, episodes_show)
                     plot_rewards('Test costs', all_test_costs, episodes_show, episodes_show)
                     plot_rewards('Training rewards', all_rewards, episodes_show)
