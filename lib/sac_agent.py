@@ -22,7 +22,7 @@ class SacAgent(object):
         self.gamma = 0.99
         self.q_lr = 3e-4
         self.actor_lr = 3e-4
-        self.alpha_lr = 3e-4
+        self.alpha_lr = 3e-3
 
         self.update_step = 0
         self.delay_step = 2
