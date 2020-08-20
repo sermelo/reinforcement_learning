@@ -104,14 +104,13 @@ class SacAgent(object):
             return
         states, actions, rewards, next_states, costs, fails = self.memory.get_batch(self.batch_size)
         not_fails = (fails == 0)
-        no_costs = (costs == 0)
 
         next_actions, next_log_pi = self.actor.sample(next_states)
 
         next_q_1 = self.q_net_1_target(next_states, next_actions)
         next_q_2 = self.q_net_2_target(next_states, next_actions)
         next_q_target = torch.min(next_q_1, next_q_2) - self.alpha * next_log_pi
-        expected_q = rewards - costs + no_costs * not_fails * self.gamma * next_q_target
+        expected_q = rewards - costs + not_fails * self.gamma * next_q_target
 
         curr_q_1 = self.q_net_1.forward(states, actions)
         curr_q_2 = self.q_net_2.forward(states, actions)
