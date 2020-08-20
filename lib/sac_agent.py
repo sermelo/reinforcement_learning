@@ -110,7 +110,7 @@ class SacAgent(object):
         next_q_1 = self.q_net_1_target(next_states, next_actions)
         next_q_2 = self.q_net_2_target(next_states, next_actions)
         next_q_target = torch.min(next_q_1, next_q_2) - self.alpha * next_log_pi
-        expected_q = rewards - costs + not_fails * self.gamma * next_q_target
+        expected_q = rewards + not_fails * self.gamma * next_q_target
 
         curr_q_1 = self.q_net_1.forward(states, actions)
         curr_q_2 = self.q_net_2.forward(states, actions)
