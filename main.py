@@ -100,7 +100,7 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
             show = False
             if episode % episodes_show == 0:
                 show = True
-            reward, step, cost, fail = run_one_episode(agent, env, False, False, max_steps, train_writer)
+            reward, step, cost, fail = run_one_episode(agent, env, True, False, max_steps, train_writer)
             print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}, cost/reward ratio: {cost/reward}')
             episode_train_writer.writerow([episode, reward, cost])
 
@@ -109,11 +109,11 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
             all_costs.append(cost)
 
             if show:
-                reward, step, cost, fail = run_one_episode(agent, env, show, True, max_steps, test_writer)
-                all_test_rewards.append(reward - cost)
-                all_test_costs.append(cost)
-                plot_rewards('Test rewards', all_test_rewards, episodes_show, episodes_show)
-                plot_rewards('Test costs', all_test_costs, episodes_show, episodes_show)
+#                reward, step, cost, fail = run_one_episode(agent, env, show, True, max_steps, test_writer)
+#                all_test_rewards.append(reward - cost)
+#                all_test_costs.append(cost)
+#                plot_rewards('Test rewards', all_test_rewards, episodes_show, episodes_show)
+#                plot_rewards('Test costs', all_test_costs, episodes_show, episodes_show)
                 plot_rewards('Training rewards', all_rewards, episodes_show)
                 plot_rewards('Training costs', all_costs, episodes_show)
 
