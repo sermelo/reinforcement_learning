@@ -8,6 +8,7 @@ from torch.distributions import Normal
 
 from lib.sac_actor import SacActor
 from lib.critic import Critic
+from lib.cost_critic import CostCritic
 from lib.memory import Memory
 
 class SacAgent(object):
@@ -51,13 +52,13 @@ class SacAgent(object):
         self.copy_networks(self.q_net_2, self.q_net_2_target)
         self.q_net_2_optimizer = optim.Adam(self.q_net_2.parameters(), lr=self.q_lr)
 
-        self.cost_net_1 = Critic(env.observation_space.shape[0], env.action_space.shape[0])
-        self.cost_net_1_target = Critic(env.observation_space.shape[0], env.action_space.shape[0])
+        self.cost_net_1 = CostCritic(env.observation_space.shape[0], env.action_space.shape[0])
+        self.cost_net_1_target = CostCritic(env.observation_space.shape[0], env.action_space.shape[0])
         self.copy_networks(self.cost_net_1, self.cost_net_1_target)
         self.cost_net_1_optimizer = optim.Adam(self.cost_net_1.parameters(), lr=self.q_lr)
 
-        self.cost_net_2 = Critic(env.observation_space.shape[0], env.action_space.shape[0])
-        self.cost_net_2_target = Critic(env.observation_space.shape[0], env.action_space.shape[0])
+        self.cost_net_2 = CostCritic(env.observation_space.shape[0], env.action_space.shape[0])
+        self.cost_net_2_target = CostCritic(env.observation_space.shape[0], env.action_space.shape[0])
         self.copy_networks(self.cost_net_2, self.cost_net_2_target)
         self.cost_net_2_optimizer = optim.Adam(self.cost_net_2.parameters(), lr=self.q_lr)
 
@@ -152,6 +153,7 @@ class SacAgent(object):
                 self.cost_net_1.forward(states, new_actions),
                 self.cost_net_2.forward(states, new_actions)
             )
+            max_cost[max_cost < 0.25] = 0
             actor_loss = (self.alpha * log_pi - min_q + max_cost).mean()
 
             self.actor_optimizer.zero_grad()
