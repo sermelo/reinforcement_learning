@@ -115,6 +115,9 @@ class SacAgent(object):
         if (len(self.memory) < self.batch_size):
             return
 
+        states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size, 0.25)
+        self.train_cost_net(states, actions, rewards, next_states, costs, fails)
+
         states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size, 0.75)
 
         self.train_cost_net(states, actions, rewards, next_states, costs, fails)
