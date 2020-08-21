@@ -14,6 +14,6 @@ class CostCritic(nn.Module):
         x = torch.cat([state, action], 1)
         x = F.relu(self.linear1(x))
         x = F.relu(self.linear2(x))
-        x = self.linear3(x)
+        x = F.leaky_relu(self.linear3(x))
         return x
 
