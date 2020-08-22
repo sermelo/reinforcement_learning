@@ -73,3 +73,5 @@ class Memory(object):
     def __len__(self):
         return len(self.buffer)
 
+    def cost_buffer_size(self):
+        return len(self.cost_buffer)
