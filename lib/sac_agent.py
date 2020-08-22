@@ -26,6 +26,7 @@ class SacAgent(object):
         self.cost_lr = 3e-3
         self.actor_lr = 3e-4
         self.alpha_lr = 3e-3
+        self.printer = 0
 
         self.update_step = 0
         self.delay_step = 2
@@ -116,12 +117,16 @@ class SacAgent(object):
         if (len(self.memory) < self.batch_size):
             return
 
-        states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size, 0.25)
+        states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size, 0.5)
+        self.train_cost_net(states, actions, rewards, next_states, costs, fails)
+        states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size, 0.5)
         self.train_cost_net(states, actions, rewards, next_states, costs, fails)
 
-        states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size, 0.75)
-
+        states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.batch_size, 0.5)
         self.train_cost_net(states, actions, rewards, next_states, costs, fails)
+        states, actions, rewards, next_states, costs, fails = self.memory.get_batch(self.batch_size)
+
+        #self.train_cost_net(states, actions, rewards, next_states, costs, fails)
         not_fails = (fails == 0)
 
         next_actions, next_log_pi = self.actor.sample(next_states)
@@ -151,10 +156,8 @@ class SacAgent(object):
                 self.q_net_1.forward(states, new_actions),
                 self.q_net_2.forward(states, new_actions)
             )
-            max_cost = torch.max(
-                self.cost_net_1.forward(states, new_actions),
-                self.cost_net_2.forward(states, new_actions)
-            )
+            max_cost = (self.cost_net_1.forward(states, new_actions) +
+                        self.cost_net_2.forward(states, new_actions)) /2
             max_cost[max_cost < 0.25] = 0
             actor_loss = (self.alpha * log_pi - min_q + max_cost).mean()
 
@@ -181,6 +184,16 @@ class SacAgent(object):
         self.update_step += 1
 
     def train_cost_net(self, states, actions, rewards, next_states, costs, fails):
+        if self.memory.cost_buffer_size() < 300:
+            return
+
+        self.printer += 1
+        if self.printer % 1000 == 0:
+            states, actions, rewards, next_states, costs, fails = self.memory.get_cost_training_batch(self.memory.cost_buffer_size(), 0)
+            prediction = self.cost_net_1.forward(states, actions)
+            test = (prediction < 0.5)
+            print(f'Failing predictions: {torch.sum(test)} of {self.memory.cost_buffer_size()}')
+
         next_actions, next_log_pi = self.actor.sample(next_states)
 
         next_cost_1 = self.cost_net_1_target(next_states, next_actions)
