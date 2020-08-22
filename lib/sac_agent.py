@@ -23,6 +23,7 @@ class SacAgent(object):
         self.gamma = 0.99
         self.cost_gamma = 0.9
         self.q_lr = 3e-4
+        self.cost_lr = 3e-3
         self.actor_lr = 3e-4
         self.alpha_lr = 3e-3
 
@@ -55,12 +56,12 @@ class SacAgent(object):
         self.cost_net_1 = CostCritic(env.observation_space.shape[0], env.action_space.shape[0])
         self.cost_net_1_target = CostCritic(env.observation_space.shape[0], env.action_space.shape[0])
         self.copy_networks(self.cost_net_1, self.cost_net_1_target)
-        self.cost_net_1_optimizer = optim.Adam(self.cost_net_1.parameters(), lr=self.q_lr)
+        self.cost_net_1_optimizer = optim.Adam(self.cost_net_1.parameters(), lr=self.cost_lr)
 
         self.cost_net_2 = CostCritic(env.observation_space.shape[0], env.action_space.shape[0])
         self.cost_net_2_target = CostCritic(env.observation_space.shape[0], env.action_space.shape[0])
         self.copy_networks(self.cost_net_2, self.cost_net_2_target)
-        self.cost_net_2_optimizer = optim.Adam(self.cost_net_2.parameters(), lr=self.q_lr)
+        self.cost_net_2_optimizer = optim.Adam(self.cost_net_2.parameters(), lr=self.cost_lr)
 
     def copy_networks(self, org_net, dest_net):
         for dest_param, param in zip(dest_net.parameters(), org_net.parameters()):
