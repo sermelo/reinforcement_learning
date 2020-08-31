@@ -66,8 +66,9 @@ def test(agent, env, num_of_episodes, max_steps):
     return all_rewards/num_of_episodes
 
 def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
-    training_data_file = os.path.join(data_dir, 'training.csv')
-    test_data_file = os.path.join(data_dir, 'test.csv')
+    episode_training_data_file = os.path.join(data_dir, 'episode_training.csv')
+    training_data_file = os.path.join(data_dir, 'step_training.csv')
+    test_data_file = os.path.join(data_dir, 'step_test.csv')
     # Define every how many episodes we will show a test and update the graphs
     min_episode_show = int(num_of_episodes / 10)
     if episodes_show > min_episode_show:
@@ -80,32 +81,37 @@ def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
     all_test_rewards = []
     all_test_costs = []
 
-    with open(training_data_file, 'w', newline='') as train_csvfile:
+    with open(episode_training_data_file, 'w', newline='') as episode_train_csvfile, \
+         open(training_data_file, 'w', newline='') as train_csvfile, \
+         open(test_data_file, 'w', newline='') as test_csvfile:
+
+        episode_train_writer = csv.writer(episode_train_csvfile, delimiter=',',
+                                          quotechar='|', quoting=csv.QUOTE_MINIMAL)
         train_writer = csv.writer(train_csvfile, delimiter=',',
                                   quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        with open(test_data_file, 'w', newline='') as test_csvfile:
-            test_writer = csv.writer(test_csvfile, delimiter=',',
-                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            total_steps = 0
-            for episode in range(num_of_episodes):
-                show = False
-                if episode % episodes_show == 0:
-                    show = True
-                reward, step, cost, fail = run_one_episode(agent, env, False, False, max_steps, train_writer)
-                print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}, cost/reward ratio: {cost/reward}')
+        test_writer = csv.writer(test_csvfile, delimiter=',',
+                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        total_steps = 0
+        for episode in range(num_of_episodes):
+            show = False
+            if episode % episodes_show == 0:
+                show = True
+            reward, step, cost, fail = run_one_episode(agent, env, False, False, max_steps, train_writer)
+            print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}, cost/reward ratio: {cost/reward}')
+            episode_train_writer.writerow([episode, reward, cost])
 
-                total_steps += step
-                all_rewards.append(reward)
-                all_costs.append(cost)
+            total_steps += step
+            all_rewards.append(reward)
+            all_costs.append(cost)
 
-                if show:
-                    reward, step, cost, fail = run_one_episode(agent, env, show, True, max_steps, test_writer)
-                    all_test_rewards.append(reward - cost)
-                    all_test_costs.append(cost)
-                    plot_rewards('Test rewards', all_test_rewards, episodes_show, episodes_show)
-                    plot_rewards('Test costs', all_test_costs, episodes_show, episodes_show)
-                    plot_rewards('Training rewards', all_rewards, episodes_show)
-                    plot_rewards('Training costs', all_costs, episodes_show)
+            if show:
+                reward, step, cost, fail = run_one_episode(agent, env, show, True, max_steps, test_writer)
+                all_test_rewards.append(reward - cost)
+                all_test_costs.append(cost)
+                plot_rewards('Test rewards', all_test_rewards, episodes_show, episodes_show)
+                plot_rewards('Test costs', all_test_costs, episodes_show, episodes_show)
+                plot_rewards('Training rewards', all_rewards, episodes_show)
+                plot_rewards('Training costs', all_costs, episodes_show)
 
 def plot_rewards(name, train_rewards, avg_of, step=1):
     plt.figure(name)
