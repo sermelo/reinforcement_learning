@@ -56,13 +56,17 @@ def run_one_episode(agent, env, render, test, max_steps, data_file=None):
             break
     return episode_reward, step, episode_cost, fail
 
-def test(agent, env, num_of_episodes, max_steps):
+def test(data_dir, agent, env, num_of_episodes, max_steps):
+    episode_test_data_file = os.path.join(data_dir, 'episode_test.csv')
     all_rewards = 0
     max_steps = get_max_steps(max_steps, env)
-    for episode in range(num_of_episodes):
-        reward, step, cost, fail = run_one_episode(agent, env, True, True, max_steps)
-        print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}')
-        all_rewards += reward
+    with open(episode_test_data_file, 'w', newline='') as episode_test_csvfile:
+        episode_test_writer = csv.writer(episode_test_csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        for episode in range(num_of_episodes):
+            reward, step, cost, fail = run_one_episode(agent, env, True, True, max_steps)
+            print(f'Episode: {episode}, step: {step}, reward: {reward}, cost: {cost}, fail: {fail}')
+            all_rewards += reward
+            episode_test_writer.writerow([episode, reward, cost])
     return all_rewards/num_of_episodes
 
 def train(data_dir, agent, env, num_of_episodes, max_steps, episodes_show=50):
@@ -187,7 +191,8 @@ if args.model_dir:
     agent.load_model(args.model_dir)
 
 if args.just_test:
-    test(agent, env, args.episodes, args.max_steps)
+    test(data_dir, agent, env, args.episodes, args.max_steps)
+    print(f'All data saved in {data_dir}')
 else:
     ## Train
     print('****TRAINING****')
