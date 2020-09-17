@@ -150,7 +150,7 @@ for aim in ['Goal', 'Button', 'Push']:
         for robot in ['Point', 'Car', 'Doggo']:
             supported_environments.append(f'Safexp-{robot}{aim}{level}-v0')
 
-parser = argparse.ArgumentParser(description='Train for openai with DDPG algoritm.')
+parser = argparse.ArgumentParser(description='Train for openai with DDPG or SAC algorithm.')
 parser.add_argument('--env', dest='environment_name', type=str, choices=supported_environments,
                     required=True, help='Openai environment')
 parser.add_argument('--alg', dest='algorithm', type=str, choices=supported_algorithms,
