@@ -37,7 +37,7 @@ class SacAgent(object):
         self.log_alpha = torch.zeros(1, requires_grad=True)
         self.alpha_optim = optim.Adam([self.log_alpha], lr=self.alpha_lr)
 
-        self.actor = SacActor(env.observation_space.shape[0], env.action_space.shape[0], env.action_space.high, env.action_space.low)
+        self.actor = SacActor(env.observation_space.shape[0], env.action_space.shape[0])
         self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=self.actor_lr)
 
         self.q_net_1 = Critic(env.observation_space.shape[0], env.action_space.shape[0])

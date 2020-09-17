@@ -6,15 +6,12 @@ import torch.nn.functional as F
 from torch.distributions import Normal
 
 class SacActor(nn.Module): 
-    def __init__(self, input_size, output_size, high, low):
+    def __init__(self, input_size, output_size):
         super(SacActor, self).__init__()
         self.hidden_size = 256
         self.log_std_min=-20
         self.log_std_max=2
 
-        self.low = torch.tensor(low)
-        self.high = torch.tensor(high)
- 
         self.linear1 = nn.Linear(input_size, self.hidden_size)
         self.linear2 = nn.Linear(self.hidden_size, self.hidden_size)
 
