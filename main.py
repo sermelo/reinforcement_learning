@@ -2,6 +2,7 @@
 
 import gym
 import safety_gym
+from gym import wrappers
 
 import sys
 import os
@@ -163,12 +164,10 @@ parser.add_argument('--max-steps', dest="max_steps", type=int, required=False, d
                     help='Max steps per episode')
 parser.add_argument('--test', dest="just_test", required=False, default=False, action='store_true',
                     help='Execute just tests. This option is remcomended with load-model option')
-
+parser.add_argument('--video', dest="record_video", required=False, default=False, action='store_true',
+                    help='Record the episodes to video')
 
 args = parser.parse_args()
-
-## Define the environment
-env = gym.make(args.environment_name)
 
 # Create data dir
 data_dir_name = f'data/{args.algorithm}_{args.environment_name}_{time.strftime("%Y_%m_%d_%H_%M_%S")}'
@@ -176,6 +175,11 @@ execution_path = os.path.dirname(os.path.realpath(__file__))
 data_dir = os.path.join(execution_path, data_dir_name)
 os.makedirs(data_dir)
 print(f'Data dir: {data_dir}')
+
+## Define the environment
+env = gym.make(args.environment_name)
+if (args.record_video):
+    env = wrappers.Monitor(env, f'{data_dir}/videos/')
 
 ## Define the agent
 batch_size = 100
