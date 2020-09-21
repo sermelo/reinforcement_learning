@@ -33,7 +33,7 @@ class SacActor(nn.Module):
 
         normal = Normal(mean, std)
         z = normal.rsample()
-        action = torch.tanh(z)# * self.high
+        action = torch.tanh(z)
 
         log_pi = normal.log_prob(z) - torch.log(1 - action.pow(2) + epsilon)
         log_pi = log_pi.sum(1, keepdim=True)
